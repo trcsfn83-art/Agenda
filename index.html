@@ -202,6 +202,11 @@ main{padding-block:18px 64px;padding-left:max(16px,env(safe-area-inset-left,0px)
 .add{border:0;background:transparent;color:var(--accent);font:500 13px var(--f-text);padding:7px 0 2px;display:inline-flex;align-items:center;gap:4px}
 .add .ic{width:15px;height:15px}
 .add:hover{text-decoration:underline}
+.planline{display:flex;align-items:flex-start;gap:7px;background:color-mix(in srgb,var(--accent) 10%,var(--wp));border-radius:7px;padding:4px 8px;margin:3px 0 4px}
+.planline .ic{width:15px;height:15px;color:var(--wband-ink);margin-top:6px;flex:none}
+.planin{flex:1;min-width:0;border:0;background:transparent;font-family:var(--wff);font-size:1em;line-height:1.35;padding:4px 0;color:var(--wi);resize:none;overflow:hidden;display:block;width:100%}
+.planin:focus{outline:none}
+.night .planin{background:none;min-height:0;line-height:1.35;padding:4px 0}
 .night textarea{display:block;width:100%;border:0;resize:none;overflow:hidden;font-family:var(--wff);font-size:1em;line-height:1.75em;min-height:5.25em;padding:0 2px;color:var(--wi);
   background:linear-gradient(to bottom,transparent calc(100% - 1px),var(--wl) calc(100% - 1px)) 0 0/100% 1.75em local}
 .night textarea:focus{outline:none}
@@ -428,7 +433,7 @@ main{padding-block:18px 64px;padding-left:max(16px,env(safe-area-inset-left,0px)
 .wname:focus{outline:none;border-bottom-color:var(--accent)}
 .copybox{width:100%;height:160px;font:12px var(--f-mono);border:1px solid var(--rule);border-radius:8px;padding:8px;background:var(--chip);color:var(--ink)}
 @media (pointer:coarse){
-  .row textarea,.night textarea,.ac input,.mrow textarea,.fld .fval,.fld .flab,.anote,.tpk select,.cidin,.bdn,.bdy,.bddate select,.pnotes textarea,.nhead input,.owner input,.jump input{font-size:max(16px,1em)}
+  .row textarea,.night textarea,.ac input,.mrow textarea,.fld .fval,.fld .flab,.anote,.tpk select,.planin,.cidin,.bdn,.bdy,.bddate select,.pnotes textarea,.nhead input,.owner input,.jump input{font-size:max(16px,1em)}
   .del{opacity:.7}
 }
 </style>
@@ -502,6 +507,7 @@ const IC={
   list:'<path d="M10 7h10M10 12h10M10 17h10"/><path d="M4.5 5.5h1.2v3.2M4.4 8.7h2.4M4.4 13.2c.3-.6 2.3-.8 2.3.4 0 1-2.3 1.5-2.4 2.6h2.5" stroke-width="1.3"/>',
   check:'<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8.2 12.2l2.6 2.6 5-5.4"/>',
   fit:'<path d="M4 9V5h4M20 9V5h-4M4 15v4h4M20 15v4h-4"/>',
+  plan:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9.5h16M8.5 3.5v3M15.5 3.5v3M8 13h3M8 16.5h6"/>',
   cake:'<path d="M4 20h16M5.5 20v-6.5A1.5 1.5 0 017 12h10a1.5 1.5 0 011.5 1.5V20"/><path d="M5.5 15.8c1.1 0 1.1.9 2.2.9s1.1-.9 2.2-.9 1.1.9 2.1.9 1.1-.9 2.2-.9 1.1.9 2.2.9 1.1-.9 2.1-.9"/><path d="M12 12V9.2M8.5 12V9.6M15.5 12V9.6"/><path d="M12 7.2c.9 0 1.1-1.1 0-2.6-1.1 1.5-.9 2.6 0 2.6z"/>'
 };
 function icon(n){const s=document.createElementNS('http://www.w3.org/2000/svg','svg'); s.setAttribute('viewBox','0 0 24 24'); s.setAttribute('class','ic'); s.setAttribute('aria-hidden','true'); s.innerHTML=IC[n].replace(/class="f"/g,'fill="currentColor" stroke="none"'); return s;}
@@ -608,7 +614,7 @@ function N(id){const b=S.docs['n_'+id]; if(!b||b.del||!b.d) return null; const n
 function notesIn(g){const out=[]; for(const k in S.docs){if(!k.startsWith('n_')) continue; const b=S.docs[k]; if(b.del||!b.d||b.d.g!==g) continue; out.push({id:k.slice(2),d:b.d});} out.sort((a,b)=>(a.d.o||0)-(b.d.o||0)||(a.id<b.id?-1:1)); return out;}
 function weekStyle(w){const wd=W(w,false); return Object.assign({},DEF_WSTYLE,M().settings.weekStyle,(wd&&wd.style)||{});}
 function weekHasContent(w){const wd=W(w,false); if(!wd) return false; for(const k in wd.days){const d=wd.days[k]; if((d.a&&d.a.some(x=>x.x))||(d.c&&d.c.some(x=>x.x))||(d.n&&d.n.trim())) return true;} return false;}
-function dayHasContent(dk){const d=D(dk,false); return !!d&&((d.a.some(x=>x.x))||(d.c.some(x=>x.x))||!!d.n.trim());}
+function dayHasContent(dk){const d=D(dk,false); if(M().annual[dk]) return true; return !!d&&((d.a.some(x=>x.x))||(d.c.some(x=>x.x))||!!d.n.trim());}
 function ensureDefaults(){M(); const pats=['lines','grid','dots']; pats.forEach((p,i)=>{const k='n_front'+(i+1); if(!S.docs[k]) S.docs[k]={u:1,d:Object.assign({g:'front',o:i+1,title:'',text:'',strokes:[],created:0},DEF_NSTYLE,{pattern:p})};});}
 function createNote(g){const list=notesIn(g); const last=list[list.length-1]; const base=last?{pattern:last.d.pattern,spacing:last.d.spacing,paper:last.d.paper,font:last.d.font,ink:last.d.ink,size:last.d.size||1}:M().settings.noteStyle;
   const id=rid(); S.docs['n_'+id]={u:Date.now(),d:Object.assign({},DEF_NSTYLE,base,{g,o:(last?(last.d.o||0):0)+1,title:'',text:'',strokes:[],created:Date.now()})}; dirty.add('n_'+id); changed(); return id;}
@@ -1043,8 +1049,11 @@ function todoSection(dk){
   draw();
   return h('div',{class:'sec'},h('h4',{class:'lbl'},'Cose da fare',cnt),ul,h('button',{type:'button',class:'add',on:{click:()=>add()}},icon('plus'),'Cosa da fare'));
 }
+function planLine(dk){const a=M().annual; if(!a[dk]) return null;
+  const t=ta('planin',a[dk],'',v=>{if(v) a[dk]=v; else delete a[dk]; touchMeta('annual');},{'aria-label':'Nota dal planning'});
+  return h('div',{class:'planline',title:'Scritto nel planning annuale: se lo cambi qui, cambia anche lì'},icon('plan'),t);}
 function nightSection(dk){const d=D(dk,false);
-  return h('div',{class:'sec night'},h('h4',{class:'lbl'},'Note'),ta('',d?d.n:'','Note del giorno…',v=>{const dd=D(dk,true); dd.n=v; touchDay(dk);},{'aria-label':'Note del giorno'}));}
+  return h('div',{class:'sec night'},h('h4',{class:'lbl'},'Note'),planLine(dk),ta('',d?d.n:'','Note del giorno…',v=>{const dd=D(dk,true); dd.n=v; touchDay(dk);},{'aria-label':'Note del giorno'}));}
 function notesStrip(g){
   const list=notesIn(g);
   return h('div',{class:'wnotes'},h('span',{class:'lbl'},g==='front'?'Pagine appunti':'Appunti dopo questa settimana'),
