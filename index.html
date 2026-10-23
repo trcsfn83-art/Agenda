@@ -23,7 +23,7 @@
 :root{
   --desk:#E5E4EB; --paper:#FCFBF8; --ink:#25232C; --muted:#6B6777; --rule:#D9D6E2;
   --accent:#5545A6; --on-accent:#FFFFFF; --holiday:#B23C34; --sage:#6E9F63;
-  --chip:#EEECF4; --overlay:rgba(24,20,40,.36);
+  --chip:#EEECF4; --overlay:rgba(24,20,40,.36); --bday:#B8336A;
   --shadow:0 1px 2px rgba(35,28,70,.07),0 10px 28px rgba(35,28,70,.10);
   --f-display:'Red Hat Display',system-ui,-apple-system,'Segoe UI',sans-serif;
   --f-text:'Red Hat Text',system-ui,-apple-system,'Segoe UI',sans-serif;
@@ -33,12 +33,12 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --desk:#121117; --paper:#1C1B22; --ink:#E8E6EF; --muted:#A29EB1; --rule:#33303D;
   --accent:#A797F4; --on-accent:#17132B; --holiday:#F08B80; --sage:#7FB574;
-  --chip:#26242E; --overlay:rgba(0,0,0,.55);
+  --chip:#26242E; --overlay:rgba(0,0,0,.55); --bday:#F38BB4;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35); color-scheme:dark}}
 :root[data-theme="dark"]{
   --desk:#121117; --paper:#1C1B22; --ink:#E8E6EF; --muted:#A29EB1; --rule:#33303D;
   --accent:#A797F4; --on-accent:#17132B; --holiday:#F08B80; --sage:#7FB574;
-  --chip:#26242E; --overlay:rgba(0,0,0,.55);
+  --chip:#26242E; --overlay:rgba(0,0,0,.55); --bday:#F38BB4;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35); color-scheme:dark}
 
 *{box-sizing:border-box}
@@ -73,6 +73,13 @@ input,textarea,select{font:inherit;color:inherit}
 .sync[data-s="ok"] i{background:var(--sage)}
 .sync[data-s="busy"] i{background:var(--accent);animation:pulse 1s ease-in-out infinite}
 .sync[data-s="error"] i{background:var(--holiday)}
+button.sync{border:0;background:transparent;padding:6px 8px;border-radius:9px;cursor:pointer;font:inherit;font-size:12.5px;color:var(--muted)}
+button.sync:hover{background:var(--chip)}
+.dstat{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:12px 0;font-size:14px}
+.dstat span:nth-child(odd){color:var(--muted)}
+.cidin{width:100%;height:42px;border:1px solid var(--rule);border-radius:10px;background:var(--paper);padding:0 12px;font:500 13px var(--f-mono);color:var(--ink);margin-top:8px}
+.cidin:focus{outline:none;border-color:var(--accent)}
+.mono{font:500 12px var(--f-mono);word-break:break-all}
 @keyframes pulse{50%{opacity:.35}}
 .menu{position:fixed;z-index:60;min-width:250px;background:var(--paper);border:1px solid var(--rule);border-radius:12px;box-shadow:var(--shadow);padding:6px;display:flex;flex-direction:column}
 .menu button{display:flex;align-items:center;gap:10px;padding:10px 12px;border:0;background:transparent;border-radius:8px;text-align:left}
@@ -274,7 +281,7 @@ main{padding-block:18px 64px;padding-left:max(16px,env(safe-area-inset-left,0px)
 .mrow.td{box-shadow:inset 3px 0 0 var(--accent)}
 .ychips{display:flex;gap:6px;flex-wrap:wrap}
 
-/* ---------- personal ---------- */
+/* ---------- personal page ---------- */
 .owner{display:flex;flex-direction:column;gap:6px;margin:4px 0 22px}
 .owner .lbl{color:var(--wmuted)}
 .owner input{font:500 clamp(26px,4vw,38px)/1.1 var(--f-display);border:0;border-bottom:1.5px solid var(--wi);background:transparent;padding:4px 0 8px;width:100%;color:var(--wi);letter-spacing:-.01em}
@@ -386,13 +393,42 @@ main{padding-block:18px 64px;padding-left:max(16px,env(safe-area-inset-left,0px)
 .help ul{margin:6px 0 0;padding-left:20px}
 .help li{margin:6px 0;line-height:1.45}
 .modal .seg{flex-wrap:wrap}
+.bdays{display:flex;flex-direction:column;gap:3px;margin-top:5px}
+.bday{display:flex;align-items:center;gap:6px;font:600 12.5px/1.25 var(--f-text);color:var(--bday);background:color-mix(in srgb,var(--bday) 13%,var(--wp));border-radius:7px;padding:5px 9px}
+.bday .ic{width:16px;height:16px}
+.dayview .bday{font-size:14px;padding:7px 11px}
+.day.bd .dh{box-shadow:inset 4px 0 0 var(--bday)}
+.ac.bd{box-shadow:inset 3px 0 0 var(--bday)}
+.ac.bd input::placeholder{color:var(--bday);opacity:.9}
+.mrow.bd .dn{color:var(--bday)}
+.mrow .dw .bdm1{display:flex;align-items:center;gap:4px;font:600 11.5px/1.3 var(--f-text);color:var(--bday);margin-top:2px}
+.mrow .dw .bdm1 .ic{width:13px;height:13px}
+.bdlist{display:flex;flex-direction:column}
+.bdm{margin:18px 0 4px;font:600 11.5px var(--f-text);letter-spacing:.12em;text-transform:uppercase;color:var(--wband-ink)}
+.bdlist .bdm:first-child{margin-top:4px}
+.bdrow{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto auto;grid-template-areas:"date name year soon del";align-items:center;gap:6px 10px;border-bottom:1px solid var(--wl);padding:7px 0}
+.bdrow .bddate{grid-area:date}.bdrow .bdname{grid-area:name}.bdrow .bdy{grid-area:year}.bdrow .bdsoon{grid-area:soon;justify-self:start}.bdrow .del{grid-area:del}
+@container sheet (max-width:620px){.bdrow{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"date soon del" "name name year"}}
+.bdrow:focus-within{border-bottom-color:var(--accent)}
+.bddate{display:flex;gap:6px;flex:none}
+.bddate select{-webkit-appearance:none;appearance:none;border:1px solid var(--wl);border-radius:8px;background:transparent;padding:6px 9px;font:500 14px var(--f-text);color:var(--wi);cursor:pointer}
+.bddate select:focus{outline:none;border-color:var(--accent)}
+.bdname{display:flex;align-items:center;gap:7px;min-width:0;color:var(--bday)}
+.bdname .ic{width:18px;height:18px}
+.bdn{flex:1;min-width:0;border:0;background:transparent;font-family:var(--wff);font-size:1.05em;padding:6px 0;color:var(--wi)}
+.bdn:focus,.bdy:focus{outline:none}
+.bdy{width:4.2em;border:0;border-bottom:1px dashed var(--wl);background:transparent;font:500 13px var(--f-mono);padding:6px 2px;color:var(--wi);text-align:center}
+.bdsoon{font:600 11px var(--f-text);color:var(--bday);background:color-mix(in srgb,var(--bday) 12%,var(--wp));border-radius:10px;padding:3px 8px;white-space:nowrap}
+.bdsoon.now{background:var(--bday);color:var(--wp)}
+.bdempty{color:var(--wmuted);margin:8px 0;max-width:60ch;line-height:1.5}
+.bdnext{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:-4px 0 10px;font-size:13px;color:var(--wmuted)}
 .wrow{display:flex;align-items:baseline;gap:10px;margin:16px 0 8px;flex-wrap:wrap}
 .wpre{font:500 26px/1.2 var(--f-display)}
 .wname{flex:1 1 170px;min-width:0;font:500 26px/1.2 var(--f-display);border:0;border-bottom:1.5px solid var(--ink);background:transparent;padding:2px 0 6px;color:var(--ink)}
 .wname:focus{outline:none;border-bottom-color:var(--accent)}
 .copybox{width:100%;height:160px;font:12px var(--f-mono);border:1px solid var(--rule);border-radius:8px;padding:8px;background:var(--chip);color:var(--ink)}
 @media (pointer:coarse){
-  .row textarea,.night textarea,.ac input,.mrow textarea,.fld .fval,.fld .flab,.anote,.tpk select,.pnotes textarea,.nhead input,.owner input,.jump input{font-size:max(16px,1em)}
+  .row textarea,.night textarea,.ac input,.mrow textarea,.fld .fval,.fld .flab,.anote,.tpk select,.cidin,.bdn,.bdy,.bddate select,.pnotes textarea,.nhead input,.owner input,.jump input{font-size:max(16px,1em)}
   .del{opacity:.7}
 }
 </style>
@@ -410,7 +446,7 @@ main{padding-block:18px 64px;padding-left:max(16px,env(safe-area-inset-left,0px)
     </div>
     <div class="acts">
       <button class="btn" id="bToday" type="button">Oggi</button>
-      <span class="sync" id="sync" data-s="init" title=""><i></i><span>Avvio…</span></span>
+      <button type="button" class="sync" id="sync" data-s="init" title=""><i></i><span>Avvio…</span></button>
       <button class="btn primary" id="bSave" type="button" title="Salva tutta l'agenda in un file"><span>Salva file</span><b class="dot" id="saveDot" hidden></b></button>
       <button class="ib" id="bMore" type="button" aria-label="Altre azioni" title="Altre azioni"></button>
     </div>
@@ -465,7 +501,8 @@ const IC={
   restore:'<path d="M4.5 12a7.5 7.5 0 107.5-7.5A7.4 7.4 0 006.6 7"/><path d="M5 3.8v3.8h3.8"/>',
   list:'<path d="M10 7h10M10 12h10M10 17h10"/><path d="M4.5 5.5h1.2v3.2M4.4 8.7h2.4M4.4 13.2c.3-.6 2.3-.8 2.3.4 0 1-2.3 1.5-2.4 2.6h2.5" stroke-width="1.3"/>',
   check:'<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8.2 12.2l2.6 2.6 5-5.4"/>',
-  fit:'<path d="M4 9V5h4M20 9V5h-4M4 15v4h4M20 15v4h-4"/>'
+  fit:'<path d="M4 9V5h4M20 9V5h-4M4 15v4h4M20 15v4h-4"/>',
+  cake:'<path d="M4 20h16M5.5 20v-6.5A1.5 1.5 0 017 12h10a1.5 1.5 0 011.5 1.5V20"/><path d="M5.5 15.8c1.1 0 1.1.9 2.2.9s1.1-.9 2.2-.9 1.1.9 2.1.9 1.1-.9 2.2-.9 1.1.9 2.2.9 1.1-.9 2.1-.9"/><path d="M12 12V9.2M8.5 12V9.6M15.5 12V9.6"/><path d="M12 7.2c.9 0 1.1-1.1 0-2.6-1.1 1.5-.9 2.6 0 2.6z"/>'
 };
 function icon(n){const s=document.createElementNS('http://www.w3.org/2000/svg','svg'); s.setAttribute('viewBox','0 0 24 24'); s.setAttribute('class','ic'); s.setAttribute('aria-hidden','true'); s.innerHTML=IC[n].replace(/class="f"/g,'fill="currentColor" stroke="none"'); return s;}
 const rid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
@@ -527,6 +564,10 @@ const DEF_TSTYLE={paper:null,font:'rh',ink:null,size:1};
 const STANDALONE=!(window.claude&&typeof window.claude.use==='function');
 const IOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 const DBNAME='agenda-settimanale';
+/* Google Drive: il codice dell'app (Client ID) creato in Google Cloud. Non è un segreto. */
+const G_CLIENT_ID='';
+const G_SCOPE='https://www.googleapis.com/auth/drive.file';
+const DRIVE_OK=STANDALONE&&(location.protocol==='https:'||location.hostname==='localhost');
 function lum(hex){const m=/^#?([0-9a-f]{6})$/i.exec(hex||''); if(!m) return 1; const n=parseInt(m[1],16); const c=[n>>16&255,n>>8&255,n&255].map(v=>{v/=255; return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);}); return .2126*c[0]+.7152*c[1]+.0722*c[2];}
 function styleVars(st){const v={}; if(st.paper){v['--wp']=st.paper; v['--wi']=st.ink||(lum(st.paper)>.35?'#24222B':'#ECEAF3');} else if(st.ink) v['--wi']=st.ink;
   const f=FONTS[st.font]||FONTS.rh; v['--wff']=f.css; v['--wfs']=String((st.size||1)*f.s); return v;}
@@ -550,11 +591,17 @@ function defaultProfile(){return {owner:'',groups:[
   {id:'g3',title:'Salute ed emergenze',fields:[fld('sangue','Gruppo sanguigno'),fld('allergie','Allergie'),fld('medico','Medico di base'),fld('emNome','In caso di emergenza avvisare'),fld('emTel','Telefono di emergenza')]},
   {id:'g4',title:'Documenti e veicolo',fields:[fld('ci',"Carta d'identità n."),fld('cf','Codice fiscale'),fld('patente','Patente n.'),fld('ts','Tessera sanitaria n.'),fld('targa','Targa auto'),fld('assic','Assicurazione e scadenza')]}
 ],note:''};}
-function defaultMeta(){return {profile:defaultProfile(),annual:{},annualHead:{},years:[2026,2027],settings:{weekStyle:Object.assign({},DEF_WSTYLE),noteStyle:Object.assign({},DEF_NSTYLE),yearStyle:Object.assign({},DEF_TSTYLE),monthStyle:Object.assign({},DEF_TSTYLE),infoStyle:Object.assign({},DEF_TSTYLE)},fileSavedAt:0};}
+function defaultMeta(){return {profile:defaultProfile(),annual:{},annualHead:{},years:[2026,2027],settings:{weekStyle:Object.assign({},DEF_WSTYLE),noteStyle:Object.assign({},DEF_NSTYLE),yearStyle:Object.assign({},DEF_TSTYLE),monthStyle:Object.assign({},DEF_TSTYLE),infoStyle:Object.assign({},DEF_TSTYLE),bdayStyle:Object.assign({},DEF_TSTYLE)},bdays:[],fileSavedAt:0};}
 function M(){let b=S.docs.meta; if(!b||b.del||!b.d){b=S.docs.meta={u:0,d:defaultMeta()};}
   const d=b.d; d.profile=d.profile||defaultProfile(); d.annual=d.annual||{}; d.annualHead=d.annualHead||{}; d.years=Array.isArray(d.years)&&d.years.length?d.years:[2026,2027];
   d.settings=d.settings||{}; d.settings.weekStyle=Object.assign({},DEF_WSTYLE,d.settings.weekStyle||{}); d.settings.noteStyle=Object.assign({},DEF_NSTYLE,d.settings.noteStyle||{});
-  for(const k of ['yearStyle','monthStyle','infoStyle']) d.settings[k]=Object.assign({},DEF_TSTYLE,d.settings[k]||{}); return d;}
+  for(const k of ['yearStyle','monthStyle','infoStyle','bdayStyle']) d.settings[k]=Object.assign({},DEF_TSTYLE,d.settings[k]||{});
+  d.bdays=Array.isArray(d.bdays)?d.bdays:[]; return d;}
+function hasLocalData(){for(const k in S.docs){const b=S.docs[k]; if(!b.del&&(b.u||0)>1) return true;} return false;}
+function bdaysOn(k){const L=M().bdays; if(!L.length) return []; const mo=Mo(k)+1, dd=Dd(k), leap=diy(Y(k))===366;
+  return L.filter(b=>b.n&&b.n.trim()&&((+b.m===mo&&+b.d===dd)||(!leap&&+b.m===2&&+b.d===29&&mo===2&&dd===28)));}
+function bdayText(b,yr){const n=b.n.trim(); const base=/^(compleann|anniversari|onomastic|festa)/i.test(n)?n:'Compleanno di '+n; const by=+b.y; const age=by>1900&&yr>by?yr-by:0; return base+(age?' · '+age+' anni':'');}
+function bdayBadges(list,yr){return list.length?h('div',{class:'bdays'},list.map(b=>h('div',{class:'bday'},icon('cake'),bdayText(b,yr)))):null;}
 function W(w,create){const k='w_'+w; let b=S.docs[k]; if(!b||b.del||!b.d){if(!create) return null; b=S.docs[k]={u:0,d:{style:null,days:{}}};} b.d.days=b.d.days||{}; return b.d;}
 function D(dk,create){const w=W(mondayOf(dk),create); if(!w) return null; let d=w.days[dk]; if(!d){if(!create) return null; d=w.days[dk]={a:[],c:[],n:''};} d.a=Array.isArray(d.a)?d.a:[]; d.c=Array.isArray(d.c)?d.c:[]; if(typeof d.n!=='string') d.n=''; return d;}
 function N(id){const b=S.docs['n_'+id]; if(!b||b.del||!b.d) return null; const n=b.d; if(!Array.isArray(n.strokes)) n.strokes=[]; if(typeof n.text!=='string') n.text=''; return n;}
@@ -567,8 +614,9 @@ function createNote(g){const list=notesIn(g); const last=list[list.length-1]; co
   const id=rid(); S.docs['n_'+id]={u:Date.now(),d:Object.assign({},DEF_NSTYLE,base,{g,o:(last?(last.d.o||0):0)+1,title:'',text:'',strokes:[],created:Date.now()})}; dirty.add('n_'+id); changed(); return id;}
 let localT=null;
 function touch(k){const b=S.docs[k]; if(!b) return; b.u=Math.max(Date.now(),(b.u||0)+1); dirty.add(k); changed();}
-function changed(){persistSoon(); flushSoon(); updateSaveDot();}
-const touchDay=dk=>touch('w_'+mondayOf(dk));
+function changed(){persistSoon(); flushSoon(); updateSaveDot(); driveTouched();}
+const touchDay=dk=>{const d=D(dk,false); if(d) d.u=Date.now(); touch('w_'+mondayOf(dk));};
+function touchMeta(sec){const m=M(); m.ts=m.ts||{}; m.ts[sec]=Date.now(); touch('meta');}
 
 /* ================= local storage (IndexedDB) ================= */
 const IDB=(()=>{let dbp=null;
@@ -585,8 +633,8 @@ async function loadLocal(){try{const v=await IDB.get('state'); if(v&&v.docs) ret
 
 /* ================= sync between devices (private to the signed-in owner) ================= */
 let RCOL=null, flushing=false, flushT=null, syncState='init';
-function setSync(s){syncState=s; const el=$('#sync'); el.dataset.s=s==='device'?'ok':s;
-  const map={init:['Avvio…',''],busy:['Sincronizzo…','Sto salvando le modifiche nel tuo account'],ok:['Sincronizzata','Mac, iPad e iPhone vedono gli stessi dati'],local:['Solo questo dispositivo','Sincronizzazione non disponibile qui: usa Salva file'],device:['Salvata qui','Tutto resta salvato in questo browser. Con «Salva file» crei la copia da tenere su OneDrive.'],error:['Sync in pausa','Riprovo appena possibile; intanto i dati restano su questo dispositivo']};
+function setSync(s){syncState=s; const el=$('#sync'); el.dataset.s=(s==='device'||s==='drive')?'ok':(s==='dauth'||s==='derror')?'error':s==='dbusy'?'busy':s;
+  const map={init:['Avvio…',''],busy:['Sincronizzo…','Sto salvando le modifiche nel tuo account'],ok:['Sincronizzata','Mac, iPad e iPhone vedono gli stessi dati'],local:['Solo questo dispositivo','Sincronizzazione non disponibile qui: usa Salva file'],drive:['Drive ✓','Sincronizzata con Google Drive'],dbusy:['Drive…','Sto sincronizzando con Google Drive'],dauth:['Drive: ricollega','Tocca per ricollegare Google Drive'],derror:['Drive in pausa','Google Drive non raggiungibile: riprovo tra poco. I dati restano su questo dispositivo.'],device:['Salvata qui','Tutto resta salvato in questo browser. Con «Salva file» crei la copia da tenere su OneDrive.'],error:['Sync in pausa','Riprovo appena possibile; intanto i dati restano su questo dispositivo']};
   const [t,tt]=map[s]||map.init; el.lastChild.textContent=t; el.title=tt;}
 async function initRemote(){
   const c=window.claude; if(!c||typeof c.use!=='function'){setSync('device'); return;}
@@ -618,14 +666,14 @@ function remoteChanged(keys){if(!cur) return; const mine=docsOfPage(cur); if(!ke
   const a=document.activeElement; if(a&&a!==document.body&&$('#view').contains(a)){pendingRerender=true; return;} rerender();}
 function docsOfPage(r){if(r.t==='week') return ['w_'+r.w,'meta']; if(r.t==='day') return ['w_'+mondayOf(r.d),'meta']; if(r.t==='note') return ['n_'+r.id]; return ['meta'];}
 document.addEventListener('focusout',()=>{if(pendingRerender) setTimeout(()=>{const a=document.activeElement; if(pendingRerender&&(!a||a===document.body)){pendingRerender=false; rerender();}},150);});
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){pull();} else {persistNow(); flush();}});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){pull(); driveResume();} else {persistNow(); flush(); if(DRIVE_OK&&DRV.on&&DRV.dirty) driveSync();}});
 window.addEventListener('pagehide',()=>{persistNow();});
-window.addEventListener('online',()=>{pull();});
+window.addEventListener('online',()=>{pull(); if(DRIVE_OK&&DRV.on) driveSync();});
 setInterval(()=>{if(document.visibilityState==='visible'&&!dirty.size) pull();},120000);
 
 /* ================= file: save & open ================= */
 function unsaved(){const fs=M().fileSavedAt||0; for(const k in S.docs){const b=S.docs[k]; if((b.u||0)>1&&(b.u||0)>fs) return true;} return false;}
-function updateSaveDot(){const d=$('#saveDot'); if(d) d.hidden=!unsaved(); const b=$('#bSave'); if(b) b.title=unsaved()?'Ci sono modifiche non ancora salvate nel file':'Ultimo file salvato: '+fmtDT(M().fileSavedAt);}
+function updateSaveDot(){const d=$('#saveDot'); if(d) d.hidden=!unsaved()||(DRIVE_OK&&!!DRV.on); const b=$('#bSave'); if(b) b.title=unsaved()?'Ci sono modifiche non ancora salvate nel file':'Ultimo file salvato: '+fmtDT(M().fileSavedAt);}
 async function saveFile(){
   const now=Date.now(); const docs={}; for(const k in S.docs){const b=S.docs[k]; if(!b.del&&(b.u||0)>0) docs[k]=b;} if(S.docs.meta) docs.meta=S.docs.meta;
   const data=JSON.stringify({format:'agenda-settimanale',version:1,savedAt:now,docs});
@@ -674,12 +722,150 @@ async function importData(text){
   for(const k in p.docs){const b=p.docs[k]; if(!validKey(k)||!b||typeof b!=='object'||!b.d||typeof b.d!=='object') continue; nd[k]={u:now,d:b.d};}
   for(const k of new Set([...Object.keys(S.docs),...remoteKeys])) if(!nd[k]&&k!=='meta') nd[k]={u:now,del:true};
   S.docs=nd; M().fileSavedAt=now; dirty.clear(); for(const k in S.docs) dirty.add(k); ensureDefaults();
-  await persistNow(); flush(); cur=initialRef(); render(0); toast('Agenda caricata dal file.'); return true;
+  await persistNow(); flush(); if(DRIVE_OK&&DRV.on){DRV.dirty=true; drvSave(); drvSoon(600);} cur=initialRef(); render(0); toast('Agenda caricata dal file.'); return true;
 }
 async function restoreBackup(){let b=null; try{b=await IDB.get('backup');}catch(e){}
   if(!b||!b.docs){toast('Non c\'è nessun dato precedente da ripristinare su questo dispositivo.'); return;}
   await importData(JSON.stringify({format:'agenda-settimanale',version:1,savedAt:b.at,docs:b.docs}));}
 $('#fileIn').addEventListener('change',async e=>{const f=e.target.files&&e.target.files[0]; e.target.value=''; if(!f) return; try{importData(await f.text());}catch(err){toast('Non riesco a leggere questo file.');}});
+
+/* ================= Google Drive sync ================= */
+/* L'agenda parla direttamente con Google dal dispositivo: nessun server in mezzo. */
+const DRV=(()=>{let o={}; try{o=JSON.parse(localStorage.getItem('agenda-drive')||'{}')||{};}catch(e){} return o;})();
+function drvSave(){try{localStorage.setItem('agenda-drive',JSON.stringify(DRV));}catch(e){}}
+const gcid=()=>G_CLIENT_ID||DRV.cid||'';
+const redirUri=()=>location.origin+location.pathname.replace(/index\.html$/,'');
+const tokenOk=()=>!!DRV.token&&(DRV.exp||0)>Date.now()+30000;
+const GAPI='https://www.googleapis.com/drive/v3', GUP='https://www.googleapis.com/upload/drive/v3';
+let drvBusy=false, drvAgain=false, drvT=null, drvAuthToast=false;
+function driveTouched(){if(!DRIVE_OK||!DRV.on) return; DRV.dirty=true; DRV.edits=(DRV.edits||0)+1; drvSave(); drvSoon();}
+function drvSoon(ms){clearTimeout(drvT); if(DRIVE_OK&&DRV.on) drvT=setTimeout(driveSync,ms==null?4000:ms);}
+async function driveLogin(silent){
+  if(!gcid()){openDrive(); return;}
+  await persistNow();
+  const st=rid()+rid(); DRV.state=st; if(silent) DRV.silentAt=Date.now(); drvSave();
+  const p=new URLSearchParams({client_id:gcid(),redirect_uri:redirUri(),response_type:'token',scope:G_SCOPE,include_granted_scopes:'true',state:st});
+  if(silent) p.set('prompt','none'); else if(!DRV.email) p.set('prompt','select_account');
+  if(DRV.email) p.set('login_hint',DRV.email);
+  location.href='https://accounts.google.com/o/oauth2/v2/auth?'+p.toString();
+}
+function driveHandleReturn(){
+  const hs=location.hash; if(!hs||hs.length<2) return null;
+  const q=new URLSearchParams(hs.slice(1)); if(!q.has('access_token')&&!q.has('error')) return null;
+  try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
+  if(!DRV.state||q.get('state')!==DRV.state) return 'badstate';
+  DRV.state='';
+  if(q.has('access_token')){DRV.token=q.get('access_token'); DRV.exp=Date.now()+(+q.get('expires_in')||3600)*1000; DRV.needTap=false; const first=!DRV.on; DRV.on=true; drvSave(); return first?'first':'ok';}
+  DRV.token=''; DRV.needTap=true; drvSave(); return 'error:'+(q.get('error')||'');
+}
+async function gfetch(url,opt){opt=opt||{};
+  if(!tokenOk()) throw {auth:true};
+  opt.headers=Object.assign({},opt.headers||{},{Authorization:'Bearer '+DRV.token});
+  let r; try{r=await fetch(url,opt);}catch(e){throw {net:true};}
+  if(r.status===401){DRV.token=''; drvSave(); throw {auth:true};}
+  if(r.status===403){let t=''; try{t=await r.text();}catch(e){} if(/insufficient|scope|accessNotConfigured|has not been used|disabled/i.test(t)) throw {setup:t}; throw {http:403};}
+  if(r.status===404) throw {nf:true};
+  if(!r.ok) throw {http:r.status};
+  return r;}
+async function drvFind(){const q="name='Agenda.json' and trashed=false and appProperties has { key='agenda' and value='1' }";
+  const r=await gfetch(GAPI+'/files?spaces=drive&pageSize=10&orderBy=modifiedTime%20desc&fields=files(id,version,modifiedTime)&q='+encodeURIComponent(q)); const j=await r.json(); return (j.files&&j.files[0])||null;}
+async function drvMeta(id){const r=await gfetch(GAPI+'/files/'+encodeURIComponent(id)+'?fields=id,version,modifiedTime,trashed'); return r.json();}
+async function drvDownload(id){const r=await gfetch(GAPI+'/files/'+encodeURIComponent(id)+'?alt=media'); return r.text();}
+async function drvCreate(body){const bd='agenda'+rid(); const meta={name:'Agenda.json',mimeType:'application/json',appProperties:{agenda:'1'}};
+  const payload='--'+bd+'\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n'+JSON.stringify(meta)+'\r\n--'+bd+'\r\nContent-Type: application/json\r\n\r\n'+body+'\r\n--'+bd+'--';
+  const r=await gfetch(GUP+'/files?uploadType=multipart&fields=id,version,modifiedTime',{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+bd},body:payload}); return r.json();}
+async function drvUpdate(id,body){const r=await gfetch(GUP+'/files/'+encodeURIComponent(id)+'?uploadType=media&fields=id,version,modifiedTime',{method:'PATCH',headers:{'Content-Type':'application/json'},body}); return r.json();}
+async function drvEmail(){try{const r=await gfetch(GAPI+'/about?fields=user(emailAddress)'); const j=await r.json(); return (j.user&&j.user.emailAddress)||'';}catch(e){return '';}}
+function drvBody(){const docs={}; for(const k in S.docs){const b=S.docs[k]; if((b.u||0)>0) docs[k]=b;} return JSON.stringify({format:'agenda-settimanale',version:1,savedAt:Date.now(),docs});}
+function dayScore(d){return d?((d.a||[]).length+(d.c||[]).length+((d.n||'').trim()?1:0)):0;}
+function mergeWeek(L,R){const ld=L.d||{}, rd=R.d||{}, la=ld.days||{}, ra=rd.days||{}; const days={};
+  for(const k of new Set([...Object.keys(la),...Object.keys(ra)])){const a=la[k], b=ra[k]; if(!a){days[k]=b; continue;} if(!b){days[k]=a; continue;}
+    const au=a.u||0, bu=b.u||0; days[k]=au>bu?a:bu>au?b:(dayScore(b)>dayScore(a)?b:a);}
+  const ls=ld.su||0, rs=rd.su||0;
+  return {u:Math.max(L.u||0,R.u||0),d:{style:ls>=rs?(ld.style===undefined?null:ld.style):rd.style,su:Math.max(ls,rs),days}};}
+const META_SECS=['profile','annual','annualHead','bdays','settings','years','welcomed'];
+function mergeMeta(L,R){const ld=L.d||{}, rd=R.d||{}, lt=ld.ts||{}, rt=rd.ts||{}; const lNew=(L.u||0)>=(R.u||0);
+  const out=clone(lNew?ld:rd), ts={};
+  for(const sec of META_SECS){const l=lt[sec]||0, r=rt[sec]||0; ts[sec]=Math.max(l,r);
+    if(l!==r){out[sec]=clone(l>r?ld[sec]:rd[sec]); continue;}
+    const nw=lNew?ld:rd, od=lNew?rd:ld;
+    if((sec==='annual'||sec==='annualHead')&&od[sec]) out[sec]=Object.assign({},od[sec],nw[sec]||{});
+    else if(sec==='bdays'&&Array.isArray(od[sec])){const ids=new Set((nw[sec]||[]).map(b=>b.id)); out[sec]=[...(nw[sec]||[]),...od[sec].filter(b=>!ids.has(b.id))];}
+    else if(nw[sec]!==undefined) out[sec]=clone(nw[sec]);}
+  out.ts=ts; out.fileSavedAt=Math.max(ld.fileSavedAt||0,rd.fileSavedAt||0);
+  return {u:Math.max(L.u||0,R.u||0),d:out};}
+function mergeIn(rdocs){const got=[]; let localNewer=false;
+  for(const k in rdocs){if(!validKey(k)) continue; const rb=rdocs[k]; if(!rb||typeof rb!=='object'||(!rb.d&&!rb.del)) continue; const lb=S.docs[k];
+    if(!lb){S.docs[k]=rb; got.push(k); continue;}
+    if(!lb.del&&!rb.del&&lb.d&&rb.d&&(k==='meta'||k.startsWith('w_'))){
+      const ls=JSON.stringify(lb), rs=JSON.stringify(rb); if(ls===rs) continue;
+      const m=k==='meta'?mergeMeta(lb,rb):mergeWeek(lb,rb); const ms=JSON.stringify(m);
+      if(ms!==ls){S.docs[k]=m; got.push(k);} if(ms!==rs) localNewer=true; continue;}
+    if((rb.u||0)>(lb.u||0)){S.docs[k]=rb; got.push(k);} else if((lb.u||0)>(rb.u||0)) localNewer=true;}
+  for(const k in S.docs){if(!(k in rdocs)&&(S.docs[k].u||0)>1) localNewer=true;}
+  return {got,localNewer};}
+async function driveSync(){
+  if(!DRIVE_OK||!DRV.on) return;
+  if(drvBusy){drvAgain=true; return;}
+  if(!tokenOk()){setSync('dauth'); driveAuthHint(); return;}
+  drvBusy=true; setSync('dbusy');
+  try{
+    let f=null;
+    if(DRV.fileId){try{const m=await drvMeta(DRV.fileId); if(!m.trashed) f=m;}catch(e){if(!e.nf) throw e;}}
+    if(!f){f=await drvFind(); DRV.fileId=f?f.id:'';}
+    if(f&&String(f.version)!==String(DRV.ver||'')){
+      const txt=await drvDownload(f.id); let pj=null; try{pj=JSON.parse(txt);}catch(e){}
+      if(pj&&pj.docs&&typeof pj.docs==='object'){
+        if(!DRV.ver&&hasLocalData()){
+          const ch=await choiceBox('Su Google Drive c\'è già un\'agenda',[h('p',null,'È stata salvata il ',h('b',null,fmtDT(pj.savedAt)),'. Anche questo dispositivo ha già dei dati.'),
+            h('p',null,'«Unisci» mette insieme le due agende giorno per giorno, senza perdere niente. «Usa solo quella di Drive» sostituisce i dati di questo dispositivo.')],['merge','Unisci (consigliato)'],['drive','Usa solo quella di Drive']);
+          if(ch==='drive'){try{await IDB.set('backup',{docs:S.docs,at:Date.now()});}catch(e){} S.docs={}; ensureDefaults();}
+        }
+        const {got,localNewer}=mergeIn(pj.docs); ensureDefaults();
+        if(got.length){persistSoon(); if(!DRV.ver){cur=cur||initialRef(); rerender();} else remoteChanged(got); updateBar();}
+        if(localNewer) DRV.dirty=true;
+      }
+      DRV.ver=String(f.version);
+    }
+    if(!f||DRV.dirty){
+      const stamp=DRV.edits||0; const res=f?await drvUpdate(f.id,drvBody()):await drvCreate(drvBody());
+      DRV.fileId=res.id; DRV.ver=String(res.version); if((DRV.edits||0)===stamp) DRV.dirty=false;
+    }
+    if(!DRV.email) DRV.email=await drvEmail();
+    DRV.lastSync=Date.now(); DRV.err=''; if(DRV.firstToast){DRV.firstToast=false; toast('Google Drive collegato: l\'agenda è sincronizzata.');} drvSave(); setSync('drive'); updateSaveDot();
+  }catch(e){
+    if(e&&e.auth){setSync('dauth'); driveAuthHint();}
+    else if(e&&e.setup){DRV.err='setup'; setSync('derror'); toast('Google Drive non è attivo nel progetto Google Cloud: controlla il passo «Attiva Google Drive API».',null,null,9000);}
+    else {DRV.err='net'; DRV.errMsg=String((e&&(e.message||e.http))||e).slice(0,200); setSync('derror'); setTimeout(()=>{if(document.visibilityState==='visible') driveSync();},30000);}
+  }finally{drvBusy=false; drvSave(); if(drvAgain){drvAgain=false; drvSoon(1200);}}
+}
+function driveAuthHint(){if(drvAuthToast) return; drvAuthToast=true; toast('Google Drive va ricollegato.','Ricollega',()=>driveLogin(false),9000);}
+function driveCanAutoLogin(){return DRIVE_OK&&DRV.on&&gcid()&&!DRV.needTap&&Date.now()-(DRV.silentAt||0)>10*60000;}
+function driveResume(){if(!DRIVE_OK||!DRV.on) return; if(tokenOk()){driveSync(); return;}
+  const a=document.activeElement; const typing=a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA');
+  if(!typing&&!document.querySelector('.modal')&&driveCanAutoLogin()) driveLogin(true); else setSync('dauth');}
+function openDrive(){
+  const body=h('div'); let close=null;
+  function draw(){body.textContent='';
+    if(!gcid()){
+      const inp=h('input',{type:'text',class:'cidin',id:'cidIn',placeholder:'…apps.googleusercontent.com',autocomplete:'off',spellcheck:'false','aria-label':'Client ID'});
+      addKids(body,[h('p',null,'Per collegare Google Drive serve il codice dell\'app (Client ID) che hai creato in Google Cloud. Incollalo qui: lo devi fare una volta su ogni dispositivo.'),inp,
+        h('p',{class:'note-inline'},'Indirizzo di ritorno da registrare in Google Cloud: ',h('span',{class:'mono'},redirUri())),
+        h('div',{class:'mbtns'},h('button',{type:'button',class:'btn primary',on:{click:()=>{const v=inp.value.trim(); if(!/\.apps\.googleusercontent\.com$/.test(v)){toast('Il Client ID finisce con «.apps.googleusercontent.com»: copialo di nuovo da Google Cloud.'); return;} DRV.cid=v; drvSave(); draw();}}},'Salva'))]);
+      return;}
+    if(!DRV.on){
+      addKids(body,[h('p',null,'L\'agenda salverà da sola il file Agenda.json nel tuo Google Drive e lo userà su tutti i dispositivi collegati. Può vedere solo i file che crea lei, non il resto del tuo Drive.'),
+        h('p',{class:'note-inline'},'Si apre la pagina di Google: scegli il tuo account Gmail e consenti. Poi torni qui da solo.'),
+        h('div',{class:'mbtns'},h('button',{type:'button',class:'btn primary',on:{click:()=>driveLogin(false)}},'Collega Google Drive'))]);
+      return;}
+    addKids(body,[h('div',{class:'dstat'},h('span',null,'Account'),h('span',null,DRV.email||'—'),h('span',null,'File'),h('span',null,'Agenda.json nel tuo Drive'),
+        h('span',null,'Ultima sincronizzazione'),h('span',null,fmtDT(DRV.lastSync)),h('span',null,'Stato'),h('span',null,tokenOk()?(DRV.dirty?'modifiche da inviare':'tutto aggiornato'):'da ricollegare')),
+      h('div',{class:'mbtns'},
+        h('button',{type:'button',class:'btn',on:{click:()=>{DRV.on=false; DRV.token=''; DRV.fileId=''; DRV.ver=''; DRV.dirty=false; drvSave(); setSync('device'); updateSaveDot(); draw(); toast('Google Drive scollegato. I dati restano su questo dispositivo.');}}},'Scollega'),
+        tokenOk()?h('button',{type:'button',class:'btn primary',on:{click:()=>{if(close) close(); driveSync();}}},'Sincronizza adesso'):h('button',{type:'button',class:'btn primary',on:{click:()=>driveLogin(false)}},'Ricollega'))]);
+  }
+  draw(); close=modal('Google Drive',[body],[]);
+}
 
 /* ================= navigation ================= */
 let cur=null;
@@ -690,7 +876,8 @@ function lastAnnual(){const ys=years(); const y=ys[ys.length-1]; return prefs.an
 function afterAnnual(){const f=notesIn('front'); return f.length?{t:'note',id:f[0].id}:{t:'week',w:START};}
 function nextOf(r){
   switch(r.t){
-    case 'info': return firstAnnual();
+    case 'info': return {t:'bday'};
+    case 'bday': return firstAnnual();
     case 'year':{const ys=years(), i=ys.indexOf(r.y); return i>=0&&i<ys.length-1?{t:'year',y:ys[i+1]}:afterAnnual();}
     case 'month':{if(r.m<11) return {t:'month',y:r.y,m:r.m+1}; const ys=years(), i=ys.indexOf(r.y); return i>=0&&i<ys.length-1?{t:'month',y:ys[i+1],m:0}:afterAnnual();}
     case 'note':{const n=N(r.id); if(!n) return {t:'week',w:START}; const l=notesIn(n.g), i=l.findIndex(x=>x.id===r.id); if(i<l.length-1) return {t:'note',id:l[i+1].id}; return n.g==='front'?{t:'week',w:START}:{t:'week',w:addDays(n.g,7)};}
@@ -700,8 +887,9 @@ function nextOf(r){
 function prevOf(r){
   switch(r.t){
     case 'info': return null;
-    case 'year':{const ys=years(), i=ys.indexOf(r.y); return i>0?{t:'year',y:ys[i-1]}:{t:'info'};}
-    case 'month':{if(r.m>0) return {t:'month',y:r.y,m:r.m-1}; const ys=years(), i=ys.indexOf(r.y); return i>0?{t:'month',y:ys[i-1],m:11}:{t:'info'};}
+    case 'bday': return {t:'info'};
+    case 'year':{const ys=years(), i=ys.indexOf(r.y); return i>0?{t:'year',y:ys[i-1]}:{t:'bday'};}
+    case 'month':{if(r.m>0) return {t:'month',y:r.y,m:r.m-1}; const ys=years(), i=ys.indexOf(r.y); return i>0?{t:'month',y:ys[i-1],m:11}:{t:'bday'};}
     case 'note':{const n=N(r.id); if(!n) return lastAnnual(); const l=notesIn(n.g), i=l.findIndex(x=>x.id===r.id); if(i>0) return {t:'note',id:l[i-1].id}; return n.g==='front'?lastAnnual():{t:'week',w:n.g};}
     case 'week':{if(r.w<=START){const f=notesIn('front'); return f.length?{t:'note',id:f[f.length-1].id}:lastAnnual();} const pw=addDays(r.w,-7), l=notesIn(pw); return l.length?{t:'note',id:l[l.length-1].id}:{t:'week',w:pw};}
     case 'day': return r.d>START?{t:'day',d:addDays(r.d,-1)}:null;
@@ -712,6 +900,7 @@ function goToday(){const t=today(); if(cur&&cur.t==='day') go({t:'day',d:t<START
 function pageTitle(r){
   switch(r.t){
     case 'info': return 'Dati personali';
+    case 'bday': return 'Compleanni';
     case 'year': return 'Planning annuale '+r.y;
     case 'month': return MESI[r.m]+' '+r.y+' · planning';
     case 'note':{const n=N(r.id); if(!n) return 'Appunti'; const l=notesIn(n.g), i=l.findIndex(x=>x.id===r.id)+1; return (n.title?n.title+' · ':'')+'Appunti '+i+'/'+l.length+(n.g==='front'?'':' · sett. '+isoWeek(n.g));}
@@ -728,7 +917,7 @@ function render(dir){
   v.classList.remove('turn-n','turn-p','turn-z'); void v.offsetWidth;
   if(dir===1) v.classList.add('turn-n'); else if(dir===-1) v.classList.add('turn-p'); else if(dir==='z') v.classList.add('turn-z');
   v.textContent=''; let el;
-  switch(cur.t){case 'info': el=renderInfo(); break; case 'year': el=renderYear(cur.y); break; case 'month': el=renderMonth(cur.y,cur.m); break;
+  switch(cur.t){case 'info': el=renderInfo(); break; case 'bday': el=renderBdays(); break; case 'year': el=renderYear(cur.y); break; case 'month': el=renderMonth(cur.y,cur.m); break;
     case 'note': el=renderNote(cur.id); break; case 'week': el=renderWeek(cur.w); break; case 'day': el=renderDay(cur.d); break;}
   v.append(el); updateBar(); renderRail(); requestAnimationFrame(()=>v.querySelectorAll('textarea.auto').forEach(autosize));
 }
@@ -799,10 +988,11 @@ function renderWeek(w){
 function dayClasses(dk){const i=dayInfo(dk); return 'day'+(i.hol?' hol':'')+(i.sun?' sun':'')+(dk===today()?' today':'');}
 function dayCol(dk){
   const i=dayInfo(dk); const y=Y(dk), dy=doy(dk);
-  return h('article',{class:dayClasses(dk),dataset:{d:dk}},
+  const bl=bdaysOn(dk); return h('article',{class:dayClasses(dk)+(bl.length?' bd':''),dataset:{d:dk}},
     h('button',{type:'button',class:'dh',title:'Ingrandisci il giorno',on:{click:()=>go({t:'day',d:dk},'z')}},
       h('span',{class:'n'},Dd(dk)),h('span',{class:'w'},GIORNI[dow(dk)]),h('span',{class:'y'},dy+'-'+(diy(y)-dy))),
     i.label?h('div',{class:'hlabel'+(i.hol?'':' soft')},i.label):null,
+    bdayBadges(bl,y),
     apptSection(dk),todoSection(dk),nightSection(dk));
 }
 function nextTime(a){let max=-1; for(const x of a){if(/^\d\d:\d\d$/.test(x.t||'')){const m=+x.t.slice(0,2)*60+ +x.t.slice(3); if(m>max) max=m;}} if(max<0) return '09:00'; const n=Math.min(max+60,23*60+30); return pad(Math.floor(n/60))+':'+pad(n%60);}
@@ -872,6 +1062,7 @@ function renderDay(dk){
       h('div',{class:'dvhead'},h('div',{class:'dvnum'},Dd(dk)),h('div',null,h('div',{class:'dvname'},GIORNI[dow(dk)]),h('div',{class:'dvmeta'},MESI[Mo(dk)]+' '+y+' · settimana '+isoWeek(dk)+' · giorno '+dy+', ne mancano '+(diy(y)-dy)))),
       h('div',{class:'tools'},seg([['week','Settimana'],['day','Giorno']],'day',v=>{if(v==='week') go({t:'week',w},'z');}),styleBtn(()=>openWeekStyle(w)))),
     i.label?h('div',{class:'hlabel'+(i.hol?'':' soft'),style:{padding:'0 0 8px'}},i.label):null,
+    bdayBadges(bdaysOn(dk),y),
     strip,
     h('div',{class:'dvbody'},h('div',null,apptSection(dk)),h('div',null,todoSection(dk),nightSection(dk))));
   sheet.append(page); return sheet;
@@ -884,13 +1075,13 @@ function annualTools(mode,y,m){
     styleBtn(()=>openViewStyle(mode==='month'?'month':'year')),
     seg([['month','Mese'],['year','Anno']],mode,v=>{prefs.annualMode=v; savePrefs(); const t=today(); go(v==='month'?{t:'month',y,m:(Y(t)===y?Mo(t):0)}:{t:'year',y},'z');}),
     h('div',{class:'ychips'},ys.map(yy=>h('button',{type:'button',class:'chip',style:yy===y?{borderColor:'var(--accent)',color:'var(--accent)'}:null,on:{click:()=>go(mode==='month'?{t:'month',y:yy,m:m||0}:{t:'year',y:yy},yy<y?-1:1)}},yy)),
-      h('button',{type:'button',class:'chip new',title:'Aggiungi il planning dell\'anno successivo',on:{click:()=>{const ny=ys[ys.length-1]+1; M().years.push(ny); touch('meta'); go({t:'year',y:ny},1); toast('Aggiunto il planning '+ny+'.');}}},icon('plus'),ys[ys.length-1]+1)));
+      h('button',{type:'button',class:'chip new',title:'Aggiungi il planning dell\'anno successivo',on:{click:()=>{const ny=ys[ys.length-1]+1; M().years.push(ny); touchMeta('years'); go({t:'year',y:ny},1); toast('Aggiunto il planning '+ny+'.');}}},icon('plus'),ys[ys.length-1]+1)));
 }
 function annualCell(k){
-  const i=dayInfo(k); const a=M().annual; const ok=k>=START;
-  const inp=h('input',{type:'text',value:a[k]||'',placeholder:'','aria-label':'Nota del '+Dd(k)+' '+MESI[Mo(k)]+(i.label?' ('+i.label+')':'')});
-  inp.addEventListener('input',()=>{if(inp.value) a[k]=inp.value; else delete a[k]; touch('meta');});
-  return h('div',{class:'ac'+(i.we?' we':'')+(i.hol?' hol':'')+(k===today()?' td':''),title:i.label||null},
+  const i=dayInfo(k); const a=M().annual; const ok=k>=START; const bt=bdaysOn(k).map(b=>bdayText(b,Y(k))).join(' · ');
+  const inp=h('input',{type:'text',value:a[k]||'',placeholder:bt,'aria-label':'Nota del '+Dd(k)+' '+MESI[Mo(k)]+(i.label?' ('+i.label+')':'')});
+  inp.addEventListener('input',()=>{if(inp.value) a[k]=inp.value; else delete a[k]; touchMeta('annual');});
+  return h('div',{class:'ac'+(i.we?' we':'')+(i.hol?' hol':'')+(bt?' bd':'')+(k===today()?' td':''),title:[i.label,bt].filter(Boolean).join(' · ')||null},
     h('button',{type:'button',class:'an',disabled:!ok,title:ok?'Apri la settimana':'',on:{click:()=>go({t:'week',w:mondayOf(k)},1)}},Dd(k)+' '+G1[dow(k)]),inp);
 }
 function renderYear(y){
@@ -900,7 +1091,7 @@ function renderYear(y){
       const n=dim(y,m); for(let d=1;d<=31;d++){col.append(d<=n?annualCell(keyOf(new Date(y,m,d))):h('div',{class:'ac void'}));} g.append(col);}
     return h('div',{class:'hscroll'},g);}
   const noteIn=h('input',{type:'text',class:'anote',value:head[y]||'',placeholder:'Promemoria per il '+y+' (es. ferie da usare entro…)','aria-label':'Promemoria dell\'anno'});
-  noteIn.addEventListener('input',()=>{if(noteIn.value) head[y]=noteIn.value; else delete head[y]; touch('meta');});
+  noteIn.addEventListener('input',()=>{if(noteIn.value) head[y]=noteIn.value; else delete head[y]; touchMeta('annualHead');});
   noteIn.style.flex='1 1 100%'; noteIn.style.margin='2px 0 0';
   const p1=h('div',{class:'pg'},h('div',{class:'phead'},h('div',null,h('h1',null,'Planning '+y),h('div',{class:'sub'},'Gennaio – Giugno · tocca un giorno per aprire la sua settimana')),annualTools('year',y),noteIn),half(0));
   const p2=h('div',{class:'pg'},h('div',{class:'phead'},h('div',null,h('h1',null,String(y)),h('div',{class:'sub'},'Luglio – Dicembre'))),half(6));
@@ -909,16 +1100,58 @@ function renderYear(y){
 function renderMonth(y,m){
   const sheet=h('section',{class:'wsheet annual',style:styleVars(M().settings.monthStyle)}); const a=M().annual, head=M().annualHead; const hk=y+'-'+pad(m+1);
   const n=dim(y,m); const rows=[];
-  for(let d=1;d<=n;d++){const k=keyOf(new Date(y,m,d)); const i=dayInfo(k); const ok=k>=START;
-    rows.push(h('div',{class:'mrow'+(i.we?' we':'')+(i.hol?' hol':'')+(k===today()?' td':'')},
+  for(let d=1;d<=n;d++){const k=keyOf(new Date(y,m,d)); const i=dayInfo(k); const ok=k>=START; const bl=bdaysOn(k);
+    rows.push(h('div',{class:'mrow'+(i.we?' we':'')+(i.hol?' hol':'')+(bl.length?' bd':'')+(k===today()?' td':'')},
       h('button',{type:'button',class:'dn',disabled:!ok,title:ok?'Apri il giorno':'',on:{click:()=>go({t:'day',d:k},'z')}},d),
-      h('div',{class:'dw'},GIORNI[dow(k)],i.label?h('small',{class:i.hol?'':'soft'},i.label):null,dow(k)===0?h('em',null,'sett. '+isoWeek(k)):null),
-      ta('',a[k]||'','',v=>{if(v) a[k]=v; else delete a[k]; touch('meta');},{'aria-label':'Nota del '+d+' '+MESI[m]})));}
+      h('div',{class:'dw'},GIORNI[dow(k)],i.label?h('small',{class:i.hol?'':'soft'},i.label):null,bl.map(b=>h('span',{class:'bdm1'},icon('cake'),bdayText(b,y))),dow(k)===0?h('em',null,'sett. '+isoWeek(k)):null),
+      ta('',a[k]||'','',v=>{if(v) a[k]=v; else delete a[k]; touchMeta('annual');},{'aria-label':'Nota del '+d+' '+MESI[m]})));}
   const half=Math.ceil(n/2);
-  const noteT=ta('anote',head[hk]||'','Note del mese (puoi fare elenchi: 1. …)',v=>{if(v) head[hk]=v; else delete head[hk]; touch('meta');},{'aria-label':'Note del mese'});
+  const noteT=ta('anote',head[hk]||'','Note del mese (puoi fare elenchi: 1. …)',v=>{if(v) head[hk]=v; else delete head[hk]; touchMeta('annualHead');},{'aria-label':'Note del mese'});
   noteT.style.resize='none'; noteT.style.overflow='hidden';
   const pg=h('div',{class:'pg'},h('div',{class:'phead'},h('div',null,h('h1',null,MESI[m]+' '+y),h('div',{class:'sub'},'Planning annuale · '+n+' giorni')),annualTools('month',y,m)),noteT,
     h('div',{class:'mlist'},h('div',null,rows.slice(0,half)),h('div',null,rows.slice(half))));
+  sheet.append(pg); return sheet;
+}
+
+/* ---------- birthdays ---------- */
+function daysUntil(b){const t0=parse(today()); const ty=t0.getFullYear(); const mk=yy=>new Date(yy,+b.m-1,Math.min(+b.d,dim(yy,+b.m-1)));
+  let d=mk(ty); if(d<t0) d=mk(ty+1); return Math.round((d-t0)/864e5);}
+function renderBdays(){
+  const L=M().bdays; const sheet=h('section',{class:'wsheet bdpage',style:styleVars(M().settings.bdayStyle)});
+  const list=h('div',{class:'bdlist'}); const next=h('div',{class:'bdnext'});
+  function add(){const t=today(); const b={id:rid(),n:'',d:Dd(t),m:Mo(t)+1,y:''}; L.push(b); touchMeta('bdays'); draw(b.id);}
+  function drawNext(){next.textContent=''; const up=L.filter(b=>b.n&&b.n.trim()).map(b=>({b,n:daysUntil(b)})).filter(x=>x.n<=60).sort((a,c)=>a.n-c.n).slice(0,4);
+    if(up.length){next.append(h('span',null,'Prossimi:'),...up.map(x=>h('span',{class:'bdsoon'+(x.n===0?' now':'')},x.b.n.trim()+' · '+(x.n===0?'oggi':x.n===1?'domani':'tra '+x.n+' giorni'))));}}
+  function draw(focusId){list.textContent='';
+    const sorted=[...L].sort((a,c)=>(+a.m-+c.m)||(+a.d-+c.d)||(a.n||'').localeCompare(c.n||''));
+    let lastM=0;
+    sorted.forEach(b=>{if(+b.m!==lastM){lastM=+b.m; list.append(h('h3',{class:'bdm'},MESI[lastM-1]));} list.append(row(b));});
+    if(!L.length) list.append(h('p',{class:'bdempty'},'Nessun compleanno per ora. Premi «Aggiungi compleanno», scegli giorno e mese e scrivi il nome: ogni anno lo ritrovi evidenziato nel giorno giusto dell\'agenda.'));
+    drawNext();
+    if(focusId){const el=list.querySelector('[data-bid="'+focusId+'"]'); if(el){el.focus(); try{el.scrollIntoView({block:'center'});}catch(e){}}}}
+  function row(b){
+    const D=h('select',{'aria-label':'Giorno'},Array.from({length:31},(_,i)=>h('option',{value:String(i+1)},String(i+1))));
+    const Mm=h('select',{'aria-label':'Mese'},MESI.map((mn,i)=>h('option',{value:String(i+1)},mn)));
+    D.value=String(b.d); Mm.value=String(b.m);
+    const fix=()=>{const mx=dim(2028,b.m-1); if(b.d>mx) b.d=mx;};
+    D.addEventListener('change',()=>{b.d=+D.value; fix(); touchMeta('bdays'); draw();});
+    Mm.addEventListener('change',()=>{b.m=+Mm.value; fix(); touchMeta('bdays'); draw();});
+    const nm=h('input',{type:'text',class:'bdn',value:b.n||'',placeholder:'Nome, es. Peppino','aria-label':'Nome',dataset:{bid:b.id}});
+    nm.addEventListener('input',()=>{b.n=nm.value; touchMeta('bdays'); drawNext();});
+    nm.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault(); nm.blur();}});
+    const yr=h('input',{type:'text',inputmode:'numeric',class:'bdy',value:b.y||'',placeholder:'anno',maxlength:'4','aria-label':'Anno di nascita, facoltativo',title:'Anno di nascita (facoltativo): così vedi quanti anni compie'});
+    yr.addEventListener('input',()=>{b.y=yr.value.replace(/\D/g,'').slice(0,4); touchMeta('bdays');});
+    const n=daysUntil(b);
+    const soon=b.n&&b.n.trim()&&n<=30?h('span',{class:'bdsoon'+(n===0?' now':'')},n===0?'Oggi':n===1?'Domani':'tra '+n+' giorni'):null;
+    const del=h('button',{type:'button',class:'del','aria-label':'Elimina compleanno',title:'Elimina',on:{click:()=>{const i=L.indexOf(b); if(i<0) return; L.splice(i,1); touchMeta('bdays'); draw();
+      toast('Compleanno eliminato.','Annulla',()=>{M().bdays.push(b); touchMeta('bdays'); rerender();});}}},icon('close'));
+    return h('div',{class:'bdrow'},h('span',{class:'bddate'},D,Mm),h('span',{class:'bdname'},icon('cake'),nm),yr,soon,del);
+  }
+  draw();
+  const pg=h('div',{class:'pg'},
+    h('div',{class:'phead'},h('div',null,h('h1',null,'Compleanni'),h('div',{class:'sub'},'Si ripetono ogni anno e compaiono evidenziati nell\'agenda')),
+      h('div',{class:'tools'},styleBtn(()=>openViewStyle('bday')),h('button',{type:'button',class:'tbtn',on:{click:add}},icon('plus'),'Aggiungi compleanno'))),
+    next,list,h('button',{type:'button',class:'add',style:{marginTop:'8px'},on:{click:add}},icon('plus'),'Aggiungi compleanno'));
   sheet.append(pg); return sheet;
 }
 
@@ -926,19 +1159,19 @@ function renderMonth(y,m){
 function renderInfo(){
   const P=M().profile; const sheet=h('section',{class:'wsheet info',style:styleVars(M().settings.infoStyle)});
   const own=h('input',{type:'text',id:'ownerName',value:P.owner||'',placeholder:'il tuo nome','aria-label':'Agenda di'});
-  own.addEventListener('input',()=>{P.owner=own.value; touch('meta'); updateBar();});
+  own.addEventListener('input',()=>{P.owner=own.value; touchMeta('profile'); updateBar();});
   const groups=h('div',{class:'groups'});
   function drawGroups(focusId){groups.textContent='';
     P.groups.forEach(g=>{const box=h('div',{class:'grp'},h('h2',null,g.title));
-      g.fields.forEach(f=>{const val=h('input',{type:'text',class:'fval',value:f.value||'','aria-label':f.label,dataset:{fid:f.id}}); val.addEventListener('input',()=>{f.value=val.value; touch('meta');});
-        let lab; if(f.custom){lab=h('input',{type:'text',class:'flab',value:f.label,placeholder:'Nome del campo','aria-label':'Nome del campo',dataset:{lid:f.id}}); lab.addEventListener('input',()=>{f.label=lab.value; touch('meta');});}
+      g.fields.forEach(f=>{const val=h('input',{type:'text',class:'fval',value:f.value||'','aria-label':f.label,dataset:{fid:f.id}}); val.addEventListener('input',()=>{f.value=val.value; touchMeta('profile');});
+        let lab; if(f.custom){lab=h('input',{type:'text',class:'flab',value:f.label,placeholder:'Nome del campo','aria-label':'Nome del campo',dataset:{lid:f.id}}); lab.addEventListener('input',()=>{f.label=lab.value; touchMeta('profile');});}
         else lab=h('label',null,f.label);
-        box.append(h('div',{class:'fld'},lab,val,f.custom?h('button',{type:'button',class:'del','aria-label':'Elimina campo',on:{click:()=>{g.fields.splice(g.fields.indexOf(f),1); touch('meta'); drawGroups();}}},icon('close')):h('span')));});
-      box.append(h('button',{type:'button',class:'add',on:{click:()=>{const f={id:rid(),label:'',value:'',custom:true}; g.fields.push(f); touch('meta'); drawGroups(f.id);}}},icon('plus'),'Aggiungi campo'));
+        box.append(h('div',{class:'fld'},lab,val,f.custom?h('button',{type:'button',class:'del','aria-label':'Elimina campo',on:{click:()=>{g.fields.splice(g.fields.indexOf(f),1); touchMeta('profile'); drawGroups();}}},icon('close')):h('span')));});
+      box.append(h('button',{type:'button',class:'add',on:{click:()=>{const f={id:rid(),label:'',value:'',custom:true}; g.fields.push(f); touchMeta('profile'); drawGroups(f.id);}}},icon('plus'),'Aggiungi campo'));
       groups.append(box);});
     if(focusId){const el=groups.querySelector('[data-lid="'+focusId+'"]'); if(el) el.focus();}}
   drawGroups();
-  const notes=ta('',P.note||'','Altre informazioni, numeri utili, codici…',v=>{P.note=v; touch('meta');},{'aria-label':'Altre informazioni'});
+  const notes=ta('',P.note||'','Altre informazioni, numeri utili, codici…',v=>{P.note=v; touchMeta('profile');},{'aria-label':'Altre informazioni'});
   const pg=h('div',{class:'pg'},
     h('div',{class:'phead'},h('div',null,h('h1',null,'Dati personali'),h('div',{class:'sub'},'Prima pagina dell\'agenda')),h('div',{class:'tools'},styleBtn(()=>openViewStyle('info')))),
     h('div',{class:'owner'},h('span',{class:'lbl'},'Agenda di'),own),
@@ -1083,10 +1316,10 @@ const mm=v=>(String(v).replace('.',','))+' mm';
 function openWeekStyle(w){
   let scope='week'; const body=h('div');
   const get=()=>scope==='all'?M().settings.weekStyle:weekStyle(w);
-  function set(patch){if(scope==='all'){Object.assign(M().settings.weekStyle,patch); touch('meta');} else {const wd=W(w,true); wd.style=Object.assign({},weekStyle(w),patch); touch('w_'+w);} rerender(); draw();}
+  function set(patch){if(scope==='all'){Object.assign(M().settings.weekStyle,patch); touchMeta('settings');} else {const wd=W(w,true); wd.style=Object.assign({},weekStyle(w),patch); wd.su=Date.now(); touch('w_'+w);} rerender(); draw();}
   function draw(){body.textContent=''; const st=get(); const own=!!(W(w,false)&&W(w,false).style);
     addKids(body,[h('div',{class:'opt'},h('span',{class:'lbl'},'Applica a'),seg([['week','Solo questa settimana'],['all','Tutte le settimane']],scope,v=>{scope=v; draw();})),
-      scope==='all'&&own?h('p',{class:'note-inline'},'Questa settimana ha uno stile suo. ',h('button',{type:'button',class:'add',on:{click:()=>{W(w,true).style=null; touch('w_'+w); rerender(); draw();}}},'Usa lo stile di tutte le settimane')):null,
+      scope==='all'&&own?h('p',{class:'note-inline'},'Questa settimana ha uno stile suo. ',h('button',{type:'button',class:'add',on:{click:()=>{W(w,true).style=null; W(w,true).su=Date.now(); touch('w_'+w); rerender(); draw();}}},'Usa lo stile di tutte le settimane')):null,
       textOpts(st,set),
       h('div',{class:'opt'},h('span',{class:'lbl'},'Colore dello sfondo'),swatchRow(PAPERS,st.paper,c=>set({paper:c}))),
       h('div',{class:'opt'},h('span',{class:'lbl'},'Tipo di sfondo'),seg(PATTERNS,st.pattern,v=>set({pattern:v}))),
@@ -1097,10 +1330,10 @@ function textOpts(st,set){return [
   h('div',{class:'opt'},h('span',{class:'lbl'},'Carattere'),fontGrid(st.font,v=>set({font:v}))),
   h('div',{class:'opt'},h('span',{class:'lbl'},'Dimensione del testo'),seg(SIZES,st.size,v=>set({size:v}))),
   h('div',{class:'opt'},h('span',{class:'lbl'},'Colore del testo'),swatchRow(INKS,st.ink,c=>set({ink:c}),'Automatico'))];}
-const VIEW_TITLES={year:'Stile della vista anno',month:'Stile della vista mese',info:'Stile dei dati personali'};
+const VIEW_TITLES={year:'Stile della vista anno',month:'Stile della vista mese',info:'Stile dei dati personali',bday:'Stile dei compleanni'};
 function openViewStyle(kind){
   const body=h('div'); const key=kind+'Style';
-  function set(patch){Object.assign(M().settings[key],patch); touch('meta'); rerender(); draw();}
+  function set(patch){Object.assign(M().settings[key],patch); touchMeta('settings'); rerender(); draw();}
   function draw(){body.textContent=''; const st=M().settings[key];
     addKids(body,[textOpts(st,set),h('div',{class:'opt'},h('span',{class:'lbl'},'Colore dello sfondo'),swatchRow(PAPERS,st.paper,c=>set({paper:c})))]);}
   draw(); modal(VIEW_TITLES[kind],[body],[h('button',{type:'button',class:'btn primary','data-close':'1'},'Fatto')]);
@@ -1129,6 +1362,8 @@ function modal(title,content,buttons,onClose){
   scrim.addEventListener('click',close); document.addEventListener('keydown',esc);
   document.body.append(scrim,box); requestAnimationFrame(()=>scrim.classList.add('on')); return close;
 }
+function choiceBox(title,content,a,b){return new Promise(res=>{let done=false; const fin=v=>{if(!done){done=true; res(v);}};
+  const close=modal(title,content,[h('button',{type:'button',class:'btn',on:{click:()=>{fin(b[0]); close();}}},b[1]),h('button',{type:'button',class:'btn primary',on:{click:()=>{fin(a[0]); close();}}},a[1])],()=>fin(a[0]));});}
 function confirmBox(title,content,okLabel,danger){return new Promise(res=>{let done=false; const fin=v=>{if(!done){done=true; res(v);}};
   const close=modal(title,content,[h('button',{type:'button',class:'btn',on:{click:()=>{fin(false); close();}}},'Annulla'),h('button',{type:'button',class:'btn '+(danger?'danger':'primary'),on:{click:()=>{fin(true); close();}}},okLabel||'Conferma')],()=>fin(false));});}
 let toastT=null;
@@ -1145,7 +1380,7 @@ function openIndex(){
   const on=r=>cur&&JSON.stringify(cur)===JSON.stringify(r)?' on':'';
   const body=h('div',{class:'dbody'});
   function draw(){body.textContent='';
-    body.append(h('div',{class:'dsec'},h('h4',{class:'lbl'},'Prime pagine'),h('button',{type:'button',class:'ditem'+on({t:'info'}),on:{click:()=>pick({t:'info'})}},'Dati personali')));
+    body.append(h('div',{class:'dsec'},h('h4',{class:'lbl'},'Prime pagine'),h('button',{type:'button',class:'ditem'+on({t:'info'}),on:{click:()=>pick({t:'info'})}},'Dati personali'),h('button',{type:'button',class:'ditem'+on({t:'bday'}),on:{click:()=>pick({t:'bday'})}},'Compleanni',h('small',null,M().bdays.length||''))));
     const an=h('div',{class:'dsec'},h('h4',{class:'lbl'},'Planning annuale'));
     years().forEach(y=>{an.append(h('button',{type:'button',class:'ditem'+on({t:'year',y}),on:{click:()=>pick({t:'year',y})}},'Tutto il '+y,h('small',null,'12 mesi')));});
     an.append(h('div',{class:'dmonth'},'Un mese alla volta'));
@@ -1182,6 +1417,7 @@ function renderRail(){
   const curM=cur.t==='week'?Y(addDays(cur.w,3))===y&&Mo(addDays(cur.w,3)):cur.t==='day'?Y(cur.d)===y&&Mo(cur.d):-1;
   const tab=(label,act,fn,dis,title)=>h('button',{type:'button',class:act?'on':'',disabled:!!dis,title:title||label,on:{click:fn}},label);
   r.append(tab('Info',cur.t==='info',()=>go({t:'info'},-1),false,'Dati personali'),
+    tab('Auguri',cur.t==='bday',()=>go({t:'bday'},-1),false,'Compleanni'),
     tab('Anno',cur.t==='year'||cur.t==='month',()=>{const yy=years().includes(y)?y:years()[0]; go(prefs.annualMode==='month'?{t:'month',y:yy,m:0}:{t:'year',y:yy},-1);},false,'Planning annuale'),
     tab('Note',cur.t==='note',()=>{const f=notesIn('front'); if(f.length) go({t:'note',id:f[0].id},-1);},!notesIn('front').length,'Pagine appunti'),
     h('div',{class:'ry'},h('button',{type:'button','aria-label':'Anno precedente',disabled:y<=2026,on:{click:()=>{railYearOverride=y-1; renderRail();}}},'▲'),h('b',null,y),h('button',{type:'button','aria-label':'Anno successivo',on:{click:()=>{railYearOverride=y+1; renderRail();}}},'▼')));
@@ -1195,7 +1431,7 @@ function openMore(){
   const m=h('div',{class:'menu',role:'menu',style:{top:(b.bottom+6)+'px',right:Math.max(12,window.innerWidth-b.right)+'px'}});
   const close=()=>{m.remove(); scrim.remove();};
   const item=(ic,label,fn)=>h('button',{type:'button',role:'menuitem',on:{click:()=>{close(); fn();}}},icon(ic),label);
-  m.append(item('open','Apri file…',openFile),item('save','Salva file',saveFile),h('hr'),
+  m.append(DRIVE_OK?item('open','Google Drive…',openDrive):null,item('open','Apri file…',openFile),item('save','Salva file',saveFile),h('hr'),
     item('restore','Ripristina i dati precedenti',restoreBackup),item('info','Come funziona',openHelp),h('hr'),
     h('small',null,'Ultimo file salvato: '+fmtDT(M().fileSavedAt)));
   scrim.addEventListener('click',close); document.body.append(scrim,m);
@@ -1206,7 +1442,9 @@ function openHelp(){
     h('li',null,h('b',null,'Salva file '),'crea ',h('b',null,'Agenda.json'),' con tutto dentro. Su iPhone e iPad scegli «Salva su File» → OneDrive e sostituisci il file vecchio. Il pallino rosso sul pulsante vuol dire che ci sono modifiche non ancora nel file.'),
     h('li',null,h('b',null,'Apri file '),'(menu ⋯) carica un Agenda.json, per esempio da OneDrive. Se ti sbagli, «Ripristina i dati precedenti» torna a prima.'),
     h('li',null,h('b',null,'Sfoglia '),'con le frecce in alto, con ← → sulla tastiera o scorrendo il dito a destra e a sinistra. Le linguette a destra portano ai mesi.'),
-    h('li',null,h('b',null,'Stile: '),'in ogni vista (anno, mese, settimana, giorno, dati personali, appunti) scegli carattere, grandezza e colore del testo.'),
+    DRIVE_OK?h('li',null,h('b',null,'Google Drive: '),'menu ⋯ → «Google Drive…» collega l\'agenda al tuo Drive personale: da quel momento si salva da sola e ritrovi tutto su ogni dispositivo collegato.'):null,
+    h('li',null,h('b',null,'Compleanni: '),'nella pagina «Compleanni» (linguetta Auguri) scegli giorno e mese e scrivi il nome; ogni anno il compleanno compare evidenziato nel giorno giusto. Con l\'anno di nascita vedi anche quanti anni compie.'),
+    h('li',null,h('b',null,'Stile: '),'in ogni vista (anno, mese, settimana, giorno, dati personali, compleanni, appunti) scegli carattere, grandezza e colore del testo.'),
     h('li',null,h('b',null,'Tocca il nome di un giorno '),'per ingrandirlo; «Settimana» torna alla vista completa.'),
     h('li',null,h('b',null,'Appuntamenti: '),'scegli l\'orario e scrivi; si mettono in ordine da soli. Il cerchietto li segna come fatti.'),
     h('li',null,h('b',null,'Cose da fare: '),'elenco numerato con la casella da spuntare. Invio aggiunge la riga successiva.'),
@@ -1219,15 +1457,16 @@ function openHelp(){
 function openWelcome(){
   const inp=h('input',{type:'text',id:'welcomeName',class:'wname',placeholder:'il tuo nome',autocomplete:'off','aria-label':'Agenda di'});
   let close=null;
-  const start=()=>{const v=inp.value.trim(); M().profile.owner=v; M().welcomed=true; touch('meta'); updateBar(); if(cur&&cur.t==='info') rerender(); if(close) close();};
+  const start=()=>{const v=inp.value.trim(); M().profile.owner=v; M().welcomed=true; touchMeta('profile'); updateBar(); if(cur&&cur.t==='info') rerender(); if(close) close();};
   inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault(); start();}});
   close=modal('Benvenuto',[h('p',null,'Dai un nome alla tua agenda. Puoi cambiarlo quando vuoi nella pagina «Dati personali».'),
     h('div',{class:'wrow'},h('span',{class:'wpre'},'Agenda di'),inp),
-    h('p',{class:'note-inline'},'Quello che scrivi resta su questo dispositivo e nel file che salvi tu.')],
-    [h('button',{type:'button',class:'btn',on:{click:()=>{M().welcomed=true; touch('meta'); close();}}},'Più tardi'),h('button',{type:'button',class:'btn primary',on:{click:start}},'Inizia')]);
+    h('p',{class:'note-inline'},'Quello che scrivi resta su questo dispositivo e nel file che salvi tu.'),
+    DRIVE_OK?h('p',{style:{marginTop:'12px'}},h('button',{type:'button',class:'add',on:{click:()=>{if(close) close(); if(gcid()) driveLogin(false); else openDrive();}}},'Ho già l\'agenda su Google Drive: collegala')):null],
+    [h('button',{type:'button',class:'btn',on:{click:()=>{M().welcomed=true; touchMeta('profile'); close();}}},'Più tardi'),h('button',{type:'button',class:'btn primary',on:{click:start}},'Inizia')]);
   setTimeout(()=>{try{inp.focus();}catch(e){}},260);
 }
-function maybeWelcome(){if(!(M().profile.owner||'').trim()&&!M().welcomed&&!document.querySelector('.modal')) openWelcome();}
+function maybeWelcome(){if(!(M().profile.owner||'').trim()&&!M().welcomed&&!(DRIVE_OK&&DRV.on)&&!document.querySelector('.modal')) openWelcome();}
 
 /* ---------- gestures & keys ---------- */
 let sw=null;
@@ -1250,13 +1489,22 @@ async function boot(){
   $('#bIndex').addEventListener('click',openIndex); $('#bPrev').addEventListener('click',goPrev); $('#bNext').addEventListener('click',goNext);
   $('#bToday').addEventListener('click',goToday); $('#bSave').addEventListener('click',saveFile); $('#bMore').addEventListener('click',openMore);
   measureBar(); window.addEventListener('resize',measureBar); if(window.ResizeObserver) new ResizeObserver(measureBar).observe($('#bar'));
+  const dret=DRIVE_OK?driveHandleReturn():null;
+  $('#sync').addEventListener('click',()=>{if(!DRIVE_OK){openHelp(); return;} if(!DRV.on){openDrive(); return;} if(tokenOk()) driveSync(); else driveLogin(false);});
   const loaded=await loadLocal();
   if(loaded){S.docs=loaded.docs||{}; (loaded.dirty||[]).forEach(k=>dirty.add(k)); remoteKeys=new Set(loaded.remoteKeys||[]);}
   ensureDefaults(); cur=initialRef(); render(0); setSync('init');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>view.querySelectorAll('textarea.auto').forEach(autosize));
   if(STANDALONE){try{if(navigator.storage&&navigator.storage.persist) navigator.storage.persist();}catch(e){}
     if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')){navigator.serviceWorker.register('sw.js').catch(()=>{});}}
-  await initRemote(); updateBar(); maybeWelcome();
+  await initRemote(); updateBar();
+  if(DRIVE_OK){
+    if(dret==='first') DRV.firstToast=true;
+    else if(dret&&dret.startsWith('error:')&&!dret.includes('interaction_required')&&!dret.includes('login_required')&&!dret.includes('consent_required')) toast('Collegamento a Google non riuscito. Riprova da ⋯ → Google Drive.',null,null,7000);
+    if(DRV.on){if(tokenOk()) driveSync(); else if(driveCanAutoLogin()){driveLogin(true); return;} else {setSync('dauth'); driveAuthHint();}}
+    setInterval(()=>{if(document.visibilityState==='visible'&&DRV.on&&tokenOk()) driveSync();},90000);
+  }
+  maybeWelcome();
 }
 boot();
 })();
