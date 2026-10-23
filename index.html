@@ -565,7 +565,7 @@ const STANDALONE=!(window.claude&&typeof window.claude.use==='function');
 const IOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 const DBNAME='agenda-settimanale';
 /* Google Drive: il codice dell'app (Client ID) creato in Google Cloud. Non è un segreto. */
-const G_CLIENT_ID='';
+const G_CLIENT_ID='787685947557-4vnm4ltsjrhtn72pm0mgpv9qdrkdjbhf.apps.googleusercontent.com';
 const G_SCOPE='https://www.googleapis.com/auth/drive.file';
 const DRIVE_OK=STANDALONE&&(location.protocol==='https:'||location.hostname==='localhost');
 function lum(hex){const m=/^#?([0-9a-f]{6})$/i.exec(hex||''); if(!m) return 1; const n=parseInt(m[1],16); const c=[n>>16&255,n>>8&255,n&255].map(v=>{v/=255; return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);}); return .2126*c[0]+.7152*c[1]+.0722*c[2];}
