@@ -424,6 +424,32 @@ main{padding-block:18px 64px;padding-left:max(16px,env(safe-area-inset-left,0px)
 .secrow b{font:600 13.5px var(--f-text)}
 .secrow select{min-width:0;width:100%;height:38px;border:1px solid var(--rule);border-radius:9px;background:var(--paper);color:var(--ink);padding:0 8px;font:500 13.5px var(--f-text)}
 @media (max-width:520px){.secrow{grid-template-columns:1fr 1fr}.secrow b{grid-column:1/-1}}
+.ltools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 12px}
+.ltabs{margin:0 0 12px}
+.ltabs .seg button{font-size:14.5px;padding:8px 16px}
+.lsearch{flex:1 1 180px;min-width:0;height:36px;border:1px solid var(--rule);border-radius:10px;background:var(--paper);padding:0 12px;color:var(--ink);font:500 14px var(--f-text)}
+.lsearch:focus{outline:none;border-color:var(--accent)}
+.lm{margin:18px 0 2px;font:600 11.5px var(--f-text);letter-spacing:.12em;text-transform:uppercase;color:var(--wband-ink)}
+.llist .lm:first-child{margin-top:2px}
+.lrow{display:grid;align-items:start;gap:2px 12px;border-bottom:1px solid var(--wl);padding:5px 0}
+.lrow.ap{grid-template-columns:5.4em 3.4em minmax(0,1fr) auto}
+.lrow.tdo{grid-template-columns:5.4em auto minmax(0,1fr)}
+.lrow.nt{grid-template-columns:5.4em minmax(0,1fr)}
+.ldate{display:flex;align-items:baseline;gap:6px;border:0;background:transparent;padding:5px 0;color:var(--wi);text-align:left;cursor:pointer}
+.ldate b{font:500 20px/1 var(--f-display);font-variant-numeric:tabular-nums}
+.ldate span{font:600 10.5px var(--f-text);letter-spacing:.06em;text-transform:uppercase;color:var(--wmuted)}
+.ldate.hol b{color:var(--holiday)}
+.ldate.now b{color:var(--accent)}
+.ldate.now span{color:var(--accent)}
+.ltime{font:500 13px var(--f-mono);color:var(--wtime,var(--wband-ink));padding-top:8px;font-variant-numeric:tabular-nums}
+.ltext{border:0;background:transparent;text-align:left;padding:6px 0;font-family:var(--wff);font-size:1em;color:var(--wi);white-space:pre-wrap;line-height:1.4;cursor:pointer;min-width:0;overflow-wrap:anywhere}
+.ltext:hover{color:var(--accent)}
+.lrow.done .ltext{text-decoration:line-through;color:var(--wmuted)}
+.lrow.past{opacity:.62}
+.lrow .ck{margin-top:7px}
+.ltag{display:inline-block;font:600 10px var(--f-text);letter-spacing:.06em;text-transform:uppercase;color:var(--wband-ink);background:var(--wband);border-radius:5px;padding:2px 6px;margin-right:6px;vertical-align:1px}
+.lsum{color:var(--wmuted);font-size:13px}
+@media (max-width:520px){.lrow.ap{grid-template-columns:4.6em 3.2em minmax(0,1fr) auto}.lrow.tdo,.lrow.nt{grid-template-columns:4.6em auto minmax(0,1fr)}.lrow.nt{grid-template-columns:4.6em minmax(0,1fr)}}
 .resets{display:flex;flex-wrap:wrap;gap:8px;padding-top:14px;border-top:1px solid var(--rule)}
 .bdays{display:flex;flex-direction:column;gap:3px;margin-top:5px}
 .bday{display:flex;align-items:center;gap:6px;font:600 12.5px/1.25 var(--f-text);color:var(--bday);background:color-mix(in srgb,var(--bday) 13%,var(--wp));border-radius:7px;padding:5px 9px}
@@ -460,7 +486,7 @@ main{padding-block:18px 64px;padding-left:max(16px,env(safe-area-inset-left,0px)
 .wname:focus{outline:none;border-bottom-color:var(--accent)}
 .copybox{width:100%;height:160px;font:12px var(--f-mono);border:1px solid var(--rule);border-radius:8px;padding:8px;background:var(--chip);color:var(--ink)}
 @media (pointer:coarse){
-  .row textarea,.night textarea,.ac input,.mrow textarea,.fld .fval,.fld .flab,.anote,.tpk select,.secrow select,.planin,.cidin,.bdn,.bdy,.bddate select,.pnotes textarea,.nhead input,.owner input,.jump input{font-size:max(16px,1em)}
+  .row textarea,.night textarea,.ac input,.mrow textarea,.fld .fval,.fld .flab,.anote,.tpk select,.lsearch,.secrow select,.planin,.cidin,.bdn,.bdy,.bddate select,.pnotes textarea,.nhead input,.owner input,.jump input{font-size:max(16px,1em)}
   .del{opacity:.7}
 }
 </style>
@@ -744,7 +770,7 @@ async function flush(){
   }finally{flushing=false; persistSoon(); setSync(err?'error':'ok'); if(!err&&dirty.size) flushSoon(); else if(err) setTimeout(flush,15000);}
 }
 let pendingRerender=false;
-function remoteChanged(keys){if(!cur) return; const mine=docsOfPage(cur); if(!keys.some(k=>mine.includes(k)||k.startsWith('n_'))) {updateBar(); return;}
+function remoteChanged(keys){if(!cur) return; const mine=cur.t==='list'?keys:docsOfPage(cur); if(!keys.some(k=>mine.includes(k)||k.startsWith('n_'))) {updateBar(); return;}
   const a=document.activeElement; if(a&&a!==document.body&&$('#view').contains(a)){pendingRerender=true; return;} rerender();}
 function docsOfPage(r){if(r.t==='week') return ['w_'+r.w,'meta']; if(r.t==='day') return ['w_'+mondayOf(r.d),'meta']; if(r.t==='note') return ['n_'+r.id]; return ['meta'];}
 document.addEventListener('focusout',()=>{if(pendingRerender) setTimeout(()=>{const a=document.activeElement; if(pendingRerender&&(!a||a===document.body)){pendingRerender=false; rerender();}},150);});
@@ -965,6 +991,7 @@ function nextOf(r){
     case 'note':{const n=N(r.id); if(!n) return {t:'week',w:START}; const l=notesIn(n.g), i=l.findIndex(x=>x.id===r.id); if(i<l.length-1) return {t:'note',id:l[i+1].id}; return n.g==='front'?{t:'week',w:START}:{t:'week',w:addDays(n.g,7)};}
     case 'week':{const l=notesIn(r.w); return l.length?{t:'note',id:l[0].id}:{t:'week',w:addDays(r.w,7)};}
     case 'day': return {t:'day',d:addDays(r.d,1)};
+    case 'list':{const i=LISTS.findIndex(x=>x[0]===r.k); return i>=0&&i<LISTS.length-1?{t:'list',k:LISTS[i+1][0]}:null;}
   }}
 function prevOf(r){
   switch(r.t){
@@ -975,6 +1002,7 @@ function prevOf(r){
     case 'note':{const n=N(r.id); if(!n) return lastAnnual(); const l=notesIn(n.g), i=l.findIndex(x=>x.id===r.id); if(i>0) return {t:'note',id:l[i-1].id}; return n.g==='front'?lastAnnual():{t:'week',w:n.g};}
     case 'week':{if(r.w<=START){const f=notesIn('front'); return f.length?{t:'note',id:f[f.length-1].id}:lastAnnual();} const pw=addDays(r.w,-7), l=notesIn(pw); return l.length?{t:'note',id:l[l.length-1].id}:{t:'week',w:pw};}
     case 'day': return r.d>START?{t:'day',d:addDays(r.d,-1)}:null;
+    case 'list':{const i=LISTS.findIndex(x=>x[0]===r.k); return i>0?{t:'list',k:LISTS[i-1][0]}:null;}
   }}
 function go(r,dir){if(!r) return; const a=document.activeElement; if(a&&a.blur) a.blur(); cur=r; railYearOverride=null; render(dir); window.scrollTo(0,0);}
 const goNext=()=>go(nextOf(cur),1), goPrev=()=>go(prevOf(cur),-1);
@@ -988,6 +1016,7 @@ function pageTitle(r){
     case 'note':{const n=N(r.id); if(!n) return 'Appunti'; const l=notesIn(n.g), i=l.findIndex(x=>x.id===r.id)+1; return (n.title?n.title+' · ':'')+'Appunti '+i+'/'+l.length+(n.g==='front'?'':' · sett. '+isoWeek(n.g));}
     case 'week': return 'Settimana '+isoWeek(r.w)+' · '+fmtShort(r.w)+' – '+fmtShort(addDays(r.w,6))+' '+Y(addDays(r.w,6));
     case 'day': return GIORNI[dow(r.d)]+' '+Dd(r.d)+' '+MESI[Mo(r.d)].toLowerCase()+' '+Y(r.d);
+    case 'list': return 'Elenchi · '+((LISTS.find(x=>x[0]===r.k)||LISTS[0])[1]);
   }}
 function updateBar(){if(!cur) return; $('#pTitle').textContent=pageTitle(cur); $('#bPrev').disabled=!prevOf(cur);
   const o=(M().profile.owner||'').trim(); $('#brandName').textContent='di '+(o||'…'); if(STANDALONE) document.title='Agenda di '+(o||'…'); updateSaveDot();}
@@ -1000,7 +1029,7 @@ function render(dir){
   if(dir===1) v.classList.add('turn-n'); else if(dir===-1) v.classList.add('turn-p'); else if(dir==='z') v.classList.add('turn-z');
   v.textContent=''; let el;
   switch(cur.t){case 'info': el=renderInfo(); break; case 'bday': el=renderBdays(); break; case 'year': el=renderYear(cur.y); break; case 'month': el=renderMonth(cur.y,cur.m); break;
-    case 'note': el=renderNote(cur.id); break; case 'week': el=renderWeek(cur.w); break; case 'day': el=renderDay(cur.d); break;}
+    case 'note': el=renderNote(cur.id); break; case 'list': el=renderList(cur.k); break; case 'week': el=renderWeek(cur.w); break; case 'day': el=renderDay(cur.d); break;}
   v.append(el); applyRoot(themeFor(cur)); updateBar(); renderRail(); requestAnimationFrame(()=>v.querySelectorAll('textarea.auto').forEach(autosize));
 }
 function rerender(){const y=window.scrollY; const v=$('#view'); v.classList.remove('turn-n','turn-p','turn-z'); render(0); window.scrollTo(0,y);}
@@ -1056,7 +1085,7 @@ function renderWeek(w){
   const left=h('div',{class:'pg '+pc},
     h('div',{class:'phead'},
       h('div',null,h('h1',null,ml),h('div',{class:'sub'},'Settimana '+isoWeek(w)+' · '+fmtShort(w)+' – '+fmtShort(addDays(w,6)))),
-      h('div',{class:'tools'},seg([['week','Settimana'],['day','Giorno']],'week',v=>{if(v==='day'){const t=today(); go({t:'day',d:(t>=w&&t<=addDays(w,6))?t:w},'z');}}),styleBtn(()=>openWeekStyle(w)))),
+      h('div',{class:'tools'},seg([['week','Settimana'],['day','Giorno'],['list','Elenchi']],'week',v=>{if(v==='list'){go({t:'list',k:'appt'},'z'); return;} if(v==='day'){const t=today(); go({t:'day',d:(t>=w&&t<=addDays(w,6))?t:w},'z');}}),styleBtn(()=>openWeekStyle(w)))),
     h('div',{class:'days'},dayCol(addDays(w,0)),dayCol(addDays(w,1)),dayCol(addDays(w,2))));
   const right=h('div',{class:'pg '+pc},
     h('div',{class:'phead'},
@@ -1145,7 +1174,7 @@ function renderDay(dk){
   const page=h('article',{class:'pg '+patClass(st.pattern)+(i.hol||i.sun?' red':'')},
     h('div',{class:'phead'},
       h('div',{class:'dvhead'},h('div',{class:'dvnum'},Dd(dk)),h('div',null,h('div',{class:'dvname'},GIORNI[dow(dk)]),h('div',{class:'dvmeta'},MESI[Mo(dk)]+' '+y+' · settimana '+isoWeek(dk)+' · giorno '+dy+', ne mancano '+(diy(y)-dy)))),
-      h('div',{class:'tools'},seg([['week','Settimana'],['day','Giorno']],'day',v=>{if(v==='week') go({t:'week',w},'z');}),styleBtn(()=>openWeekStyle(w)))),
+      h('div',{class:'tools'},seg([['week','Settimana'],['day','Giorno'],['list','Elenchi']],'day',v=>{if(v==='week') go({t:'week',w},'z'); else if(v==='list') go({t:'list',k:'appt'},'z');}),styleBtn(()=>openWeekStyle(w)))),
     i.label?h('div',{class:'hlabel'+(i.hol?'':' soft'),style:{padding:'0 0 8px'}},i.label):null,
     bdayBadges(bdaysOn(dk),y),
     strip,
@@ -1195,6 +1224,56 @@ function renderMonth(y,m){
   noteT.style.resize='none'; noteT.style.overflow='hidden';
   const pg=h('div',{class:'pg'},h('div',{class:'phead'},h('div',null,h('h1',null,MESI[m]+' '+y),h('div',{class:'sub'},'Planning annuale · '+n+' giorni')),annualTools('month',y,m)),noteT,
     h('div',{class:'mlist'},h('div',null,rows.slice(0,half)),h('div',null,rows.slice(half))));
+  sheet.append(pg); return sheet;
+}
+
+/* ---------- lists ---------- */
+const LISTS=[['appt','Appuntamenti'],['todo','Cose da fare'],['note','Note']];
+function collectList(kind){const out=[]; const A=M().annual;
+  for(const key in S.docs){if(!key.startsWith('w_')) continue; const b=S.docs[key]; if(b.del||!b.d||!b.d.days) continue;
+    for(const dk in b.d.days){const d=b.d.days[dk]; if(!d) continue;
+      if(kind==='appt') (d.a||[]).forEach(a=>{if((a.x||'').trim()) out.push({dk,t:a.t||'',x:a.x,k:!!a.k,ref:a});});
+      else if(kind==='todo') (d.c||[]).forEach((c,i)=>{if((c.x||'').trim()) out.push({dk,i,x:c.x,k:!!c.k,ref:c});});
+      else if(kind==='note'&&(d.n||'').trim()) out.push({dk,x:d.n,src:'day'});}}
+  if(kind==='note') for(const dk in A){if(/^\d{4}-\d{2}-\d{2}$/.test(dk)&&(A[dk]||'').trim()) out.push({dk,x:A[dk],src:'plan'});}
+  out.sort((p,q)=>p.dk<q.dk?-1:p.dk>q.dk?1:kind==='appt'?(p.t||'99:99').localeCompare(q.t||'99:99'):kind==='todo'?(p.i-q.i):(p.src===q.src?0:p.src==='plan'?-1:1));
+  return out;}
+function openDayFrom(dk){if(dk<START) go({t:'month',y:Y(dk),m:Mo(dk)},'z'); else go({t:'day',d:dk},'z');}
+function renderList(k){
+  if(!LISTS.some(x=>x[0]===k)) k='appt';
+  const lp=prefs.lists=(prefs.lists&&typeof prefs.lists==='object')?prefs.lists:{};
+  const sheet=h('section',{class:'wsheet lists',style:themeVars(themeFor({t:'list'}))});
+  const list=h('div',{class:'llist'}), sum=h('span',{class:'lsum'});
+  const search=h('input',{type:'search',class:'lsearch',placeholder:'Cerca…',value:lp.q||'','aria-label':'Cerca negli elenchi'});
+  search.addEventListener('input',()=>{lp.q=search.value; savePrefs(); draw();});
+  const when=()=>lp[k+'When']||(k==='appt'?'future':'all'), state=()=>lp.todoState||'open';
+  function draw(){list.textContent=''; const t=today(); const q=(lp.q||'').trim().toLowerCase();
+    let items=collectList(k);
+    if(when()==='future') items=items.filter(x=>x.dk>=t);
+    if(k==='todo'&&state()!=='all') items=items.filter(x=>state()==='open'?!x.k:x.k);
+    if(q) items=items.filter(x=>x.x.toLowerCase().includes(q));
+    const n=items.length;
+    sum.textContent=k==='appt'?(n===1?'1 appuntamento':n+' appuntamenti'):k==='todo'?(n===1?'1 cosa':n+' cose'):(n===1?'1 nota':n+' note');
+    let lastM='';
+    for(const it of items){const mk=it.dk.slice(0,7); if(mk!==lastM){lastM=mk; list.append(h('h3',{class:'lm'},MESI[+mk.slice(5)-1]+' '+mk.slice(0,4)));} list.append(row(it,t));}
+    if(!n) list.append(h('p',{class:'bdempty'},q?'Nessun risultato per «'+lp.q.trim()+'».':k==='appt'?'Nessun appuntamento'+(when()==='future'?' da oggi in poi':'')+'. Scrivili nei giorni della settimana: qui compaiono tutti in ordine di data e ora.':k==='todo'?'Nessuna cosa da fare in questo elenco.':'Nessuna nota. Qui compaiono le Note dei giorni e quello che scrivi nel planning annuale.'));}
+  function row(it,t){const dk=it.dk, i=dayInfo(dk);
+    const date=h('button',{type:'button',class:'ldate'+(dk===t?' now':'')+(i.hol||i.sun?' hol':''),title:'Apri il giorno',on:{click:()=>openDayFrom(dk)}},h('b',null,Dd(dk)),h('span',null,GIORNI[dow(dk)].slice(0,3)));
+    const text=h('button',{type:'button',class:'ltext',title:'Apri il giorno',on:{click:()=>openDayFrom(dk)}},it.src==='plan'?h('span',{class:'ltag'},'Planning'):null,it.x.trim());
+    const past=dk<t?' past':'';
+    if(k==='appt'){const ck=h('input',{type:'checkbox',class:'ck round',checked:it.k,'aria-label':'Fatto',title:'Fatto',on:{change:()=>{it.ref.k=ck.checked; touchDay(dk); draw();}}});
+      return h('div',{class:'lrow ap'+(it.k?' done':'')+past},date,h('span',{class:'ltime'},it.t||'—'),text,ck);}
+    if(k==='todo'){const ck=h('input',{type:'checkbox',class:'ck','aria-label':'Fatto',title:'Fatto',checked:it.k,on:{change:()=>{it.ref.k=ck.checked; touchDay(dk); draw();}}});
+      return h('div',{class:'lrow tdo'+(it.k?' done':'')+past},date,ck,text);}
+    return h('div',{class:'lrow nt'+past},date,text);}
+  const ctrls=[seg([['future','Da oggi in poi'],['all','Tutti']],when(),v=>{lp[k+'When']=v; savePrefs(); rerender();})];
+  if(k==='todo') ctrls.push(seg([['open','Da fare'],['done','Fatte'],['all','Tutte']],state(),v=>{lp.todoState=v; savePrefs(); rerender();}));
+  draw();
+  const pg=h('div',{class:'pg'},
+    h('div',{class:'phead'},h('div',null,h('h1',null,'Elenchi'),h('div',{class:'sub'},'In ordine di data · tocca una riga per aprire il giorno')),h('div',{class:'tools'},styleBtn())),
+    h('div',{class:'ltabs'},seg(LISTS,k,v=>go({t:'list',k:v},LISTS.findIndex(x=>x[0]===v)>LISTS.findIndex(x=>x[0]===k)?1:-1))),
+    h('div',{class:'ltools'},ctrls,search,sum),
+    list);
   sheet.append(pg); return sheet;
 }
 
@@ -1497,6 +1576,7 @@ function openIndex(){
   const body=h('div',{class:'dbody'});
   function draw(){body.textContent='';
     body.append(h('div',{class:'dsec'},h('h4',{class:'lbl'},'Prime pagine'),h('button',{type:'button',class:'ditem'+on({t:'info'}),on:{click:()=>pick({t:'info'})}},'Dati personali'),h('button',{type:'button',class:'ditem'+on({t:'bday'}),on:{click:()=>pick({t:'bday'})}},'Compleanni',h('small',null,M().bdays.length||''))));
+    body.append(h('div',{class:'dsec'},h('h4',{class:'lbl'},'Elenchi'),LISTS.map(([k,l])=>h('button',{type:'button',class:'ditem'+on({t:'list',k}),on:{click:()=>pick({t:'list',k})}},l,h('small',null,k==='appt'?'con data e ora':'con data')))));
     const an=h('div',{class:'dsec'},h('h4',{class:'lbl'},'Planning annuale'));
     years().forEach(y=>{an.append(h('button',{type:'button',class:'ditem'+on({t:'year',y}),on:{click:()=>pick({t:'year',y})}},'Tutto il '+y,h('small',null,'12 mesi')));});
     an.append(h('div',{class:'dmonth'},'Un mese alla volta'));
@@ -1535,6 +1615,7 @@ function renderRail(){
   r.append(tab('Info',cur.t==='info',()=>go({t:'info'},-1),false,'Dati personali'),
     tab('Auguri',cur.t==='bday',()=>go({t:'bday'},-1),false,'Compleanni'),
     tab('Anno',cur.t==='year'||cur.t==='month',()=>{const yy=years().includes(y)?y:years()[0]; go(prefs.annualMode==='month'?{t:'month',y:yy,m:0}:{t:'year',y:yy},-1);},false,'Planning annuale'),
+    tab('Liste',cur.t==='list',()=>go({t:'list',k:(cur.t==='list'?cur.k:'appt')},0),false,'Elenchi: appuntamenti, cose da fare, note'),
     tab('Note',cur.t==='note',()=>{const f=notesIn('front'); if(f.length) go({t:'note',id:f[0].id},-1);},!notesIn('front').length,'Pagine appunti'),
     h('div',{class:'ry'},h('button',{type:'button','aria-label':'Anno precedente',disabled:y<=2026,on:{click:()=>{railYearOverride=y-1; renderRail();}}},'▲'),h('b',null,y),h('button',{type:'button','aria-label':'Anno successivo',on:{click:()=>{railYearOverride=y+1; renderRail();}}},'▼')));
   for(let m=0;m<12;m++){const first=keyOf(new Date(y,m,1)); const lastD=keyOf(new Date(y,m,dim(y,m))); const dis=lastD<START;
@@ -1561,6 +1642,7 @@ function openHelp(){
     DRIVE_OK?h('li',null,h('b',null,'Google Drive: '),'menu ⋯ → «Google Drive…» collega l\'agenda al tuo Drive personale: da quel momento si salva da sola e ritrovi tutto su ogni dispositivo collegato.'):null,
     h('li',null,h('b',null,'Compleanni: '),'nella pagina «Compleanni» (linguetta Auguri) scegli giorno e mese e scrivi il nome; ogni anno il compleanno compare evidenziato nel giorno giusto. Con l\'anno di nascita vedi anche quanti anni compie.'),
     h('li',null,h('b',null,'Stile: '),'il pulsante «Stile» in alto cambia tutti i colori (anche lo sfondo dietro l\'agenda), il carattere e la grandezza, anche solo per Appuntamenti, Cose da fare o Note. Scegli se applicarlo a questa settimana, al mese, all\'anno o a tutte le pagine: vince sempre la scelta più specifica.'),
+    h('li',null,h('b',null,'Elenchi: '),'accanto a «Settimana» e «Giorno» trovi «Elenchi»: tutti gli appuntamenti in ordine di data e ora, tutte le cose da fare e tutte le note, ognuno nella sua finestra. Tocca una riga per aprire quel giorno.'),
     h('li',null,h('b',null,'Tocca il nome di un giorno '),'per ingrandirlo; «Settimana» torna alla vista completa.'),
     h('li',null,h('b',null,'Appuntamenti: '),'scegli l\'orario e scrivi; si mettono in ordine da soli. Il cerchietto li segna come fatti.'),
     h('li',null,h('b',null,'Cose da fare: '),'elenco numerato con la casella da spuntare. Invio aggiunge la riga successiva.'),
