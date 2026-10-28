@@ -432,9 +432,9 @@ main{padding-block:18px 64px;padding-left:max(16px,env(safe-area-inset-left,0px)
 .lm{margin:18px 0 2px;font:600 11.5px var(--f-text);letter-spacing:.12em;text-transform:uppercase;color:var(--wband-ink)}
 .llist .lm:first-child{margin-top:2px}
 .lrow{display:grid;align-items:start;gap:2px 12px;border-bottom:1px solid var(--wl);padding:5px 0}
-.lrow.ap{grid-template-columns:5.4em 3.4em minmax(0,1fr) auto}
-.lrow.tdo{grid-template-columns:5.4em auto minmax(0,1fr)}
-.lrow.nt{grid-template-columns:5.4em minmax(0,1fr)}
+.lrow.ap{grid-template-columns:5.4em 3.4em minmax(0,1fr) auto auto}
+.lrow.tdo{grid-template-columns:5.4em auto minmax(0,1fr) auto}
+.lrow.nt{grid-template-columns:5.4em minmax(0,1fr) auto}
 .ldate{display:flex;align-items:baseline;gap:6px;border:0;background:transparent;padding:5px 0;color:var(--wi);text-align:left;cursor:pointer}
 .ldate b{font:500 20px/1 var(--f-display);font-variant-numeric:tabular-nums}
 .ldate span{font:600 10.5px var(--f-text);letter-spacing:.06em;text-transform:uppercase;color:var(--wmuted)}
@@ -449,7 +449,24 @@ main{padding-block:18px 64px;padding-left:max(16px,env(safe-area-inset-left,0px)
 .lrow .ck{margin-top:7px}
 .ltag{display:inline-block;font:600 10px var(--f-text);letter-spacing:.06em;text-transform:uppercase;color:var(--wband-ink);background:var(--wband);border-radius:5px;padding:2px 6px;margin-right:6px;vertical-align:1px}
 .lsum{color:var(--wmuted);font-size:13px}
-@media (max-width:520px){.lrow.ap{grid-template-columns:4.6em 3.2em minmax(0,1fr) auto}.lrow.tdo,.lrow.nt{grid-template-columns:4.6em auto minmax(0,1fr)}.lrow.nt{grid-template-columns:4.6em minmax(0,1fr)}}
+@media (max-width:520px){.lrow.ap{grid-template-columns:4.6em 3.2em minmax(0,1fr) auto auto}.lrow.tdo{grid-template-columns:4.6em auto minmax(0,1fr) auto}.lrow.nt{grid-template-columns:4.6em minmax(0,1fr) auto}}
+.lrow .del{margin-top:3px}
+.lbl .del{width:26px;height:22px;margin:-4px -4px -4px 0}
+.menu button.danger{color:var(--holiday)}
+.bdform{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.bdform .lbl{color:var(--muted);margin-top:10px}
+.fin{height:44px;border:1px solid var(--rule);border-radius:10px;background:var(--paper);color:var(--ink);padding:0 12px;font:500 15px var(--f-text);width:100%;min-width:0}
+.fin:focus{outline:none;border-color:var(--accent)}
+.bdsels{display:flex;gap:8px}
+.bdsels .fin{flex:1}
+.bdrow.flash{animation:bdflash 1.8s ease-out}
+@keyframes bdflash{0%{background:color-mix(in srgb,var(--bday) 28%,transparent)}100%{background:transparent}}
+@media (prefers-reduced-motion:reduce){.bdrow.flash{animation:none}}
+.mvquick{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.mvdate{height:42px;border:1px solid var(--rule);border-radius:10px;background:var(--paper);color:var(--ink);padding:0 10px;font:500 15px var(--f-text)}
+.mvdate:focus{outline:none;border-color:var(--accent)}
+.modal .tpk{font-size:17px;padding:4px 0;color:var(--ink)}
+.modal .tpk select{border:1px solid var(--rule);border-radius:8px;padding:6px 4px;width:3.4ch}
 .resets{display:flex;flex-wrap:wrap;gap:8px;padding-top:14px;border-top:1px solid var(--rule)}
 .bdays{display:flex;flex-direction:column;gap:3px;margin-top:5px}
 .bday{display:flex;align-items:center;gap:6px;font:600 12.5px/1.25 var(--f-text);color:var(--bday);background:color-mix(in srgb,var(--bday) 13%,var(--wp));border-radius:7px;padding:5px 9px}
@@ -486,7 +503,7 @@ main{padding-block:18px 64px;padding-left:max(16px,env(safe-area-inset-left,0px)
 .wname:focus{outline:none;border-bottom-color:var(--accent)}
 .copybox{width:100%;height:160px;font:12px var(--f-mono);border:1px solid var(--rule);border-radius:8px;padding:8px;background:var(--chip);color:var(--ink)}
 @media (pointer:coarse){
-  .row textarea,.night textarea,.ac input,.mrow textarea,.fld .fval,.fld .flab,.anote,.tpk select,.lsearch,.secrow select,.planin,.cidin,.bdn,.bdy,.bddate select,.pnotes textarea,.nhead input,.owner input,.jump input{font-size:max(16px,1em)}
+  .row textarea,.night textarea,.ac input,.mrow textarea,.fld .fval,.fld .flab,.anote,.tpk select,.fin,.mvdate,.lsearch,.secrow select,.planin,.cidin,.bdn,.bdy,.bddate select,.pnotes textarea,.nhead input,.owner input,.jump input{font-size:max(16px,1em)}
   .del{opacity:.7}
 }
 </style>
@@ -561,6 +578,8 @@ const IC={
   list:'<path d="M10 7h10M10 12h10M10 17h10"/><path d="M4.5 5.5h1.2v3.2M4.4 8.7h2.4M4.4 13.2c.3-.6 2.3-.8 2.3.4 0 1-2.3 1.5-2.4 2.6h2.5" stroke-width="1.3"/>',
   check:'<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8.2 12.2l2.6 2.6 5-5.4"/>',
   fit:'<path d="M4 9V5h4M20 9V5h-4M4 15v4h4M20 15v4h-4"/>',
+  move:'<rect x="3.5" y="5" width="12" height="14" rx="2"/><path d="M3.5 9.5h12M7 3.5v3M12 3.5v3M13 15h7.5M18 12.5l2.5 2.5-2.5 2.5"/>',
+  copy:'<rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6A1.5 1.5 0 0014 4.5H6A1.5 1.5 0 004.5 6v8A1.5 1.5 0 006 15.5h2.5"/>',
   plan:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9.5h16M8.5 3.5v3M15.5 3.5v3M8 13h3M8 16.5h6"/>',
   cake:'<path d="M4 20h16M5.5 20v-6.5A1.5 1.5 0 017 12h10a1.5 1.5 0 011.5 1.5V20"/><path d="M5.5 15.8c1.1 0 1.1.9 2.2.9s1.1-.9 2.2-.9 1.1.9 2.1.9 1.1-.9 2.2-.9 1.1.9 2.2.9 1.1-.9 2.1-.9"/><path d="M12 12V9.2M8.5 12V9.6M15.5 12V9.6"/><path d="M12 7.2c.9 0 1.1-1.1 0-2.6-1.1 1.5-.9 2.6 0 2.6z"/>'
 };
@@ -1133,9 +1152,11 @@ function apptRow(dk,a,redraw){
   const ck=h('input',{type:'checkbox',class:'ck round',checked:!!a.k,'aria-label':'Segna come fatto',title:'Fatto',on:{change:()=>{a.k=ck.checked; li.classList.toggle('done',a.k); touchDay(dk); redraw();}}});
   const tm=timePick(a.t,v=>{a.t=v; touchDay(dk);},a.id);
   const tx=ta('',a.x,'Appuntamento…',v=>{a.x=v; touchDay(dk);},{dataset:{aid:a.id,f:'x'},'aria-label':'Descrizione appuntamento'});
-  const del=h('button',{type:'button',class:'del','aria-label':'Elimina appuntamento',title:'Elimina',on:{click:()=>{const d=D(dk,false); if(!d) return; const i=d.a.indexOf(a); if(i<0) return; d.a.splice(i,1); touchDay(dk); redraw();
-    toast('Appuntamento eliminato.','Annulla',()=>{const dd=D(dk,true); dd.a.push(a); sortAppts(dd.a); touchDay(dk); rerender();});}}},icon('close'));
-  li.append(ck,tm,tx,del); return li;
+  const doDel=()=>{const d=D(dk,false); if(!d) return; const i=d.a.indexOf(a); if(i<0) return; d.a.splice(i,1); touchDay(dk); redraw();
+    toast('Appuntamento eliminato.','Annulla',()=>{const dd=D(dk,true); dd.a.push(a); sortAppts(dd.a); touchDay(dk); rerender();});};
+  const more=h('button',{type:'button',class:'del','aria-label':'Sposta, copia o elimina',title:'Sposta, copia o elimina',on:{click:e=>popMenu(e.currentTarget,[
+    ['move','Sposta in un altro giorno',()=>openMove('appt',dk,a,false)],['copy','Copia in un altro giorno',()=>openMove('appt',dk,a,true)],null,['trash','Elimina',doDel,'danger']])}},icon('more'));
+  li.append(ck,tm,tx,more); return li;
 }
 function todoSection(dk){
   const ul=h('ul',{class:'rows'}); const cnt=h('span',{class:'cnt'});
@@ -1145,8 +1166,10 @@ function todoSection(dk){
       const ck=h('input',{type:'checkbox',class:'ck',checked:!!c.k,'aria-label':'Segna come fatto',title:'Fatto',on:{change:()=>{c.k=ck.checked; li.classList.toggle('done',c.k); touchDay(dk); count();}}});
       const tx=ta('',c.x,'Cosa da fare…',v=>{c.x=v; touchDay(dk);},{dataset:{cid:c.id},'aria-label':'Cosa da fare '+(i+1)});
       tx.addEventListener('keydown',e=>{if(e.defaultPrevented) return; if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault(); add(c);} else if(e.key==='Backspace'&&!tx.value&&arr.length>1){e.preventDefault(); const j=arr.indexOf(c); arr.splice(j,1); touchDay(dk); draw(arr[Math.max(0,j-1)].id);}});
-      const del=h('button',{type:'button',class:'del','aria-label':'Elimina',title:'Elimina',on:{click:()=>{const j=arr.indexOf(c); if(j<0) return; arr.splice(j,1); touchDay(dk); draw(); toast('Cosa da fare eliminata.','Annulla',()=>{const dd=D(dk,true); dd.c.splice(Math.min(j,dd.c.length),0,c); touchDay(dk); rerender();});}}},icon('close'));
-      li.append(h('span',{class:'lead'},h('span',{class:'num'},(i+1)+'.'),ck),tx,del); ul.append(li);});
+      const doDel=()=>{const j=arr.indexOf(c); if(j<0) return; arr.splice(j,1); touchDay(dk); draw(); toast('Cosa da fare eliminata.','Annulla',()=>{const dd=D(dk,true); dd.c.splice(Math.min(j,dd.c.length),0,c); touchDay(dk); rerender();});};
+      const more=h('button',{type:'button',class:'del','aria-label':'Sposta, copia o elimina',title:'Sposta, copia o elimina',on:{click:e=>popMenu(e.currentTarget,[
+        ['move','Sposta in un altro giorno',()=>openMove('todo',dk,c,false)],['copy','Copia in un altro giorno',()=>openMove('todo',dk,c,true)],null,['trash','Elimina',doDel,'danger']])}},icon('more'));
+      li.append(h('span',{class:'lead'},h('span',{class:'num'},(i+1)+'.'),ck),tx,more); ul.append(li);});
     count();
     if(focusId){const el=ul.querySelector('[data-cid="'+focusId+'"]'); if(el){el.focus(); const L=el.value.length; el.setSelectionRange(L,L);}}
     requestAnimationFrame(()=>ul.querySelectorAll('textarea').forEach(autosize));}
@@ -1157,8 +1180,14 @@ function todoSection(dk){
 function planLine(dk){const a=M().annual; if(!a[dk]) return null;
   const t=ta('planin',a[dk],'',v=>{if(v) a[dk]=v; else delete a[dk]; touchMeta('annual');},{'aria-label':'Nota dal planning'});
   return h('div',{class:'planline',title:'Scritto nel planning annuale: se lo cambi qui, cambia anche lì'},icon('plan'),t);}
+function noteMenu(dk,btn){const dd=D(dk,false); const hasN=!!(dd&&(dd.n||'').trim()), hasP=!!(M().annual[dk]||'').trim();
+  if(!hasN&&!hasP){toast('Le note di questo giorno sono vuote.'); return;}
+  const items=[]; if(hasN) items.push(['move','Sposta le note in un altro giorno',()=>openMove('note',dk,null,false)],['copy','Copia le note in un altro giorno',()=>openMove('note',dk,null,true)]);
+  if(hasP){if(items.length) items.push(null); items.push(['move','Sposta la nota del planning',()=>openMove('plan',dk,null,false)]);}
+  popMenu(btn,items);}
 function nightSection(dk){const d=D(dk,false);
-  return h('div',{class:'sec night sn'},h('h4',{class:'lbl'},'Note'),planLine(dk),ta('',d?d.n:'','Note del giorno…',v=>{const dd=D(dk,true); dd.n=v; touchDay(dk);},{'aria-label':'Note del giorno'}));}
+  const more=h('button',{type:'button',class:'del','aria-label':'Sposta o copia le note',title:'Sposta o copia le note',on:{click:e=>noteMenu(dk,e.currentTarget)}},icon('more'));
+  return h('div',{class:'sec night sn'},h('h4',{class:'lbl'},'Note',more),planLine(dk),ta('',d?d.n:'','Note del giorno…',v=>{const dd=D(dk,true); dd.n=v; touchDay(dk);},{'aria-label':'Note del giorno'}));}
 function notesStrip(g){
   const list=notesIn(g);
   return h('div',{class:'wnotes'},h('span',{class:'lbl'},g==='front'?'Pagine appunti':'Appunti dopo questa settimana'),
@@ -1227,6 +1256,53 @@ function renderMonth(y,m){
   sheet.append(pg); return sheet;
 }
 
+/* ---------- move & copy ---------- */
+function popMenu(anchor,items){
+  const r=anchor.getBoundingClientRect(); const scrim=h('div',{style:{position:'fixed',inset:'0',zIndex:'59'}});
+  const m=h('div',{class:'menu',role:'menu',style:{top:'0px',left:'0px',visibility:'hidden'}}); const close=()=>{m.remove(); scrim.remove();};
+  for(const it of items){if(!it){m.append(h('hr')); continue;} const [ic,label,fn,cls]=it; m.append(h('button',{type:'button',role:'menuitem',class:cls||'',on:{click:()=>{close(); fn();}}},icon(ic),label));}
+  scrim.addEventListener('click',close); document.body.append(scrim,m);
+  const mw=m.offsetWidth, mh=m.offsetHeight; let top=r.bottom+4; if(top+mh>innerHeight-8) top=Math.max(8,r.top-mh-4);
+  const left=Math.min(innerWidth-mw-8,Math.max(8,r.right-mw)); Object.assign(m.style,{top:top+'px',left:left+'px',visibility:'visible'});
+  const f=m.querySelector('button'); if(f) f.focus();}
+const dayName=dk=>GIORNI[dow(dk)].toLowerCase()+' '+Dd(dk)+' '+MESI[Mo(dk)].toLowerCase()+(Y(dk)!==Y(today())?' '+Y(dk):'');
+function restoreDays(snaps){for(const [dk,sn] of snaps){const w=W(mondayOf(dk),true); if(sn) w.days[dk]=sn; else delete w.days[dk]; const dd=D(dk,false); if(dd) dd.u=Date.now(); touch('w_'+mondayOf(dk));}}
+function transferItem(kind,src,item,dst,copy,newTime){
+  if(kind==='plan'){const A=M().annual; const txt=(A[src]||'').trim(); if(!txt) return; const before=[A[src],A[dst]];
+    A[dst]=(A[dst]||'').trim()?A[dst].trim()+' · '+txt:txt; if(!copy) delete A[src]; touchMeta('annual'); rerender();
+    toast('Nota del planning spostata a '+dayName(dst)+'.','Annulla',()=>{const B=M().annual; if(before[0]!=null) B[src]=before[0]; else delete B[src]; if(before[1]!=null) B[dst]=before[1]; else delete B[dst]; touchMeta('annual'); rerender(); toast('Annullato.');},7000); return;}
+  const snaps=[[src,D(src,false)?clone(D(src,false)):null]]; if(dst!==src) snaps.push([dst,D(dst,false)?clone(D(dst,false)):null]);
+  const S0=D(src,true), T0=D(dst,true);
+  if(kind==='appt'){let it=copy?Object.assign({},item,{id:rid()}):item; if(!copy){const i=S0.a.indexOf(item); if(i>=0) S0.a.splice(i,1);} if(newTime!=null) it.t=newTime; T0.a.push(it); sortAppts(T0.a);}
+  else if(kind==='todo'){const it=copy?Object.assign({},item,{id:rid()}):item; if(!copy){const i=S0.c.indexOf(item); if(i>=0) S0.c.splice(i,1);} T0.c.push(it);}
+  else if(kind==='note'){const txt=(S0.n||'').replace(/\s+$/,''); if(!txt.trim()) return; T0.n=(T0.n||'').trim()?T0.n.replace(/\s+$/,'')+'\n'+txt:txt; if(!copy) S0.n='';}
+  touchDay(src); if(dst!==src) touchDay(dst); rerender();
+  const what=kind==='appt'?'Appuntamento':kind==='todo'?'Cosa da fare':'Note';
+  toast(what+(copy?(kind==='note'?' copiate':' copiato'):(kind==='note'?' spostate':kind==='todo'?' spostata':' spostato'))+' a '+dayName(dst)+'.','Annulla',()=>{restoreDays(snaps); rerender(); toast('Annullato.');},7000);}
+function openMove(kind,src,item,copy){
+  const verb=copy?'Copia':'Sposta'; const t=today();
+  const label=kind==='note'?'le note di '+dayName(src):kind==='plan'?'la nota del planning':'«'+(((item&&item.x)||'').trim().split('\n')[0].slice(0,40)||(kind==='appt'?'appuntamento':'cosa da fare'))+'»';
+  let target=addDays(src,1); if(target<START) target=START;
+  const date=h('input',{type:'date',class:'mvdate',id:'mvDate',min:START,value:target,'aria-label':'Nuova data'});
+  let newT=(item&&item.t)||''; const tp=kind==='appt'?timePick(newT,v=>{newT=v;},'mv'):null;
+  const info=h('p',{class:'note-inline'});
+  const upd=()=>{const v=date.value; info.textContent=/^\d{4}-\d{2}-\d{2}$/.test(v)?'Nuovo giorno: '+GIORNI[dow(v)]+' '+Dd(v)+' '+MESI[Mo(v)].toLowerCase()+' '+Y(v):'Scegli una data.';};
+  date.addEventListener('input',upd); date.addEventListener('change',upd); upd();
+  const quick=(lab,dk)=>h('button',{type:'button',class:'chip',on:{click:()=>{date.value=dk<START?START:dk; upd();}}},lab);
+  let close=null;
+  const ok=()=>{const v=date.value; if(!/^\d{4}-\d{2}-\d{2}$/.test(v)){toast('Scegli una data.'); return;}
+    if(v<START){toast('L\'agenda comincia dal 26 ottobre 2026.'); return;}
+    if(v===src&&!(kind==='appt'&&!copy&&newT!==((item&&item.t)||''))){toast('È già in questo giorno: scegli un\'altra data.'); return;}
+    close(); transferItem(kind,src,item,v,copy,kind==='appt'?newT:null);};
+  close=modal(verb+' '+label,[
+    h('p',{class:'pt'},'Adesso è in '+dayName(src)+(kind==='appt'&&item&&item.t?', alle '+item.t:'')+'.'),
+    h('div',{class:'opt'},h('span',{class:'lbl'},'Nuovo giorno'),
+      h('div',{class:'mvquick'},quick('Oggi',t),quick('Domani',addDays(t,1)),quick('Il giorno dopo',addDays(src,1)),quick('Tra una settimana',addDays(src,7)),quick('Lunedì prossimo',addDays(mondayOf(t),7))),
+      date,info),
+    tp?h('div',{class:'opt'},h('span',{class:'lbl'},'Orario'),tp,h('p',{class:'note-inline'},'Puoi cambiarlo anche adesso.')):null],
+    [h('button',{type:'button',class:'btn','data-close':'1'},'Annulla'),h('button',{type:'button',class:'btn primary',id:'mvOk',on:{click:ok}},verb+' qui')]);
+}
+
 /* ---------- lists ---------- */
 const LISTS=[['appt','Appuntamenti'],['todo','Cose da fare'],['note','Note']];
 function collectList(kind){const out=[]; const A=M().annual;
@@ -1262,10 +1338,12 @@ function renderList(k){
     const text=h('button',{type:'button',class:'ltext',title:'Apri il giorno',on:{click:()=>openDayFrom(dk)}},it.src==='plan'?h('span',{class:'ltag'},'Planning'):null,it.x.trim());
     const past=dk<t?' past':'';
     if(k==='appt'){const ck=h('input',{type:'checkbox',class:'ck round',checked:it.k,'aria-label':'Fatto',title:'Fatto',on:{change:()=>{it.ref.k=ck.checked; touchDay(dk); draw();}}});
-      return h('div',{class:'lrow ap'+(it.k?' done':'')+past},date,h('span',{class:'ltime'},it.t||'—'),text,ck);}
+      return h('div',{class:'lrow ap'+(it.k?' done':'')+past},date,h('span',{class:'ltime'},it.t||'—'),text,ck,moreBtn('appt',it));}
     if(k==='todo'){const ck=h('input',{type:'checkbox',class:'ck','aria-label':'Fatto',title:'Fatto',checked:it.k,on:{change:()=>{it.ref.k=ck.checked; touchDay(dk); draw();}}});
-      return h('div',{class:'lrow tdo'+(it.k?' done':'')+past},date,ck,text);}
-    return h('div',{class:'lrow nt'+past},date,text);}
+      return h('div',{class:'lrow tdo'+(it.k?' done':'')+past},date,ck,text,moreBtn('todo',it));}
+    return h('div',{class:'lrow nt'+past},date,text,moreBtn(it.src==='plan'?'plan':'note',it));}
+  function moreBtn(kind,it){return h('button',{type:'button',class:'del','aria-label':'Sposta o copia',title:'Sposta o copia',on:{click:e=>popMenu(e.currentTarget,kind==='plan'?[['move','Sposta in un altro giorno',()=>openMove('plan',it.dk,null,false)]]:[
+    ['move','Sposta in un altro giorno',()=>openMove(kind,it.dk,it.ref||null,false)],['copy','Copia in un altro giorno',()=>openMove(kind,it.dk,it.ref||null,true)]])}},icon('more'));}
   const ctrls=[seg([['future','Da oggi in poi'],['all','Tutti']],when(),v=>{lp[k+'When']=v; savePrefs(); rerender();})];
   if(k==='todo') ctrls.push(seg([['open','Da fare'],['done','Fatte'],['all','Tutte']],state(),v=>{lp.todoState=v; savePrefs(); rerender();}));
   draw();
@@ -1278,12 +1356,36 @@ function renderList(k){
 }
 
 /* ---------- birthdays ---------- */
+function openBdayAdd(onAdd){
+  const nm=h('input',{type:'text',class:'fin',id:'bdName',placeholder:'es. Peppino',autocomplete:'off','aria-label':'Nome'});
+  const D=h('select',{class:'fin',id:'bdDay','aria-label':'Giorno'},h('option',{value:''},'Giorno'),Array.from({length:31},(_,i)=>h('option',{value:String(i+1)},String(i+1))));
+  const Mm=h('select',{class:'fin',id:'bdMonth','aria-label':'Mese'},h('option',{value:''},'Mese'),MESI.map((m,i)=>h('option',{value:String(i+1)},m)));
+  const yr=h('input',{type:'text',inputmode:'numeric',class:'fin',id:'bdYear',placeholder:'facoltativo, es. 1990',maxlength:'4','aria-label':'Anno di nascita'});
+  const err=h('p',{class:'note-inline',style:{color:'var(--holiday)',minHeight:'1.2em'}});
+  let close=null;
+  const read=()=>{const n=nm.value.trim(), d=+D.value, m=+Mm.value, y=yr.value.replace(/\D/g,'').slice(0,4);
+    if(!n){err.textContent='Scrivi il nome.'; nm.focus(); return null;}
+    if(!d||!m){err.textContent='Scegli il giorno e il mese.'; return null;}
+    if(d>dim(2028,m-1)){err.textContent=MESI[m-1]+' non ha '+d+' giorni.'; return null;}
+    return {id:rid(),n,d,m,y};};
+  const addOne=again=>{const b=read(); if(!b) return; onAdd(b); toast('Aggiunto: '+bdayText(b,Y(today())).replace(/ · \d+ anni$/,'')+', '+b.d+' '+MESI[b.m-1].toLowerCase()+'.');
+    if(again){nm.value=''; yr.value=''; D.value=''; Mm.value=''; err.textContent=''; nm.focus();} else close();};
+  [nm,yr].forEach(el=>el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault(); addOne(false);}}));
+  [nm,D,Mm,yr].forEach(el=>el.addEventListener(el.tagName==='SELECT'?'change':'input',()=>{err.textContent='';}));
+  close=modal('Nuovo compleanno',[h('div',{class:'bdform'},
+      h('label',{class:'lbl',for:'bdName'},'Di chi è il compleanno'),nm,
+      h('span',{class:'lbl'},'Giorno e mese'),h('div',{class:'bdsels'},D,Mm),
+      h('label',{class:'lbl',for:'bdYear'},'Anno di nascita'),yr,err)],
+    [h('button',{type:'button',class:'btn',on:{click:()=>addOne(true)}},'Aggiungi e scrivine un altro'),h('button',{type:'button',class:'btn primary',id:'bdOk',on:{click:()=>addOne(false)}},'Aggiungi')]);
+  setTimeout(()=>{try{nm.focus();}catch(e){}},250);
+}
 function daysUntil(b){const t0=parse(today()); const ty=t0.getFullYear(); const mk=yy=>new Date(yy,+b.m-1,Math.min(+b.d,dim(yy,+b.m-1)));
   let d=mk(ty); if(d<t0) d=mk(ty+1); return Math.round((d-t0)/864e5);}
 function renderBdays(){
   const L=M().bdays; const sheet=h('section',{class:'wsheet bdpage',style:themeVars(themeFor({t:'bday'}))});
   const list=h('div',{class:'bdlist'}); const next=h('div',{class:'bdnext'});
-  function add(){const t=today(); const b={id:rid(),n:'',d:Dd(t),m:Mo(t)+1,y:''}; L.push(b); touchMeta('bdays'); draw(b.id);}
+  function add(){openBdayAdd(b=>{M().bdays.push(b); touchMeta('bdays'); draw(); const el=list.querySelector('[data-bid="'+b.id+'"]'); const r=el&&el.closest('.bdrow');
+    if(r){r.classList.add('flash'); try{r.scrollIntoView({block:'center'});}catch(e){}}});}
   function drawNext(){next.textContent=''; const up=L.filter(b=>b.n&&b.n.trim()).map(b=>({b,n:daysUntil(b)})).filter(x=>x.n<=60).sort((a,c)=>a.n-c.n).slice(0,4);
     if(up.length){next.append(h('span',null,'Prossimi:'),...up.map(x=>h('span',{class:'bdsoon'+(x.n===0?' now':'')},x.b.n.trim()+' · '+(x.n===0?'oggi':x.n===1?'domani':'tra '+x.n+' giorni'))));}}
   function draw(focusId){list.textContent='';
@@ -1642,6 +1744,7 @@ function openHelp(){
     DRIVE_OK?h('li',null,h('b',null,'Google Drive: '),'menu ⋯ → «Google Drive…» collega l\'agenda al tuo Drive personale: da quel momento si salva da sola e ritrovi tutto su ogni dispositivo collegato.'):null,
     h('li',null,h('b',null,'Compleanni: '),'nella pagina «Compleanni» (linguetta Auguri) scegli giorno e mese e scrivi il nome; ogni anno il compleanno compare evidenziato nel giorno giusto. Con l\'anno di nascita vedi anche quanti anni compie.'),
     h('li',null,h('b',null,'Stile: '),'il pulsante «Stile» in alto cambia tutti i colori (anche lo sfondo dietro l\'agenda), il carattere e la grandezza, anche solo per Appuntamenti, Cose da fare o Note. Scegli se applicarlo a questa settimana, al mese, all\'anno o a tutte le pagine: vince sempre la scelta più specifica.'),
+    h('li',null,h('b',null,'Sposta e copia: '),'il pulsante ⋯ accanto a un appuntamento, a una cosa da fare o alle Note (anche negli Elenchi) apre «Sposta in un altro giorno», «Copia in un altro giorno» ed «Elimina». Dopo lo spostamento puoi sempre premere «Annulla».'),
     h('li',null,h('b',null,'Elenchi: '),'accanto a «Settimana» e «Giorno» trovi «Elenchi»: tutti gli appuntamenti in ordine di data e ora, tutte le cose da fare e tutte le note, ognuno nella sua finestra. Tocca una riga per aprire quel giorno.'),
     h('li',null,h('b',null,'Tocca il nome di un giorno '),'per ingrandirlo; «Settimana» torna alla vista completa.'),
     h('li',null,h('b',null,'Appuntamenti: '),'scegli l\'orario e scrivi; si mettono in ordine da soli. Il cerchietto li segna come fatti.'),
