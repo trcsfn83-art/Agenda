@@ -17,7 +17,7 @@
 <title>Agenda di…</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700&family=Red+Hat+Text:ital,wght@0,400;0,500;0,600;1,400&family=Red+Hat+Mono:wght@400;500&family=Lora:wght@400;500&family=Nunito:wght@400;600&family=Caveat:wght@400;600&family=Patrick+Hand&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" id="gfont" media="print" href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700&family=Red+Hat+Text:ital,wght@0,400;0,500;0,600;1,400&family=Red+Hat+Mono:wght@400;500&family=Lora:wght@400;500&family=Nunito:wght@400;600&family=Caveat:wght@400;600&family=Patrick+Hand&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 /* Layout: a spiral-bound paper planner on a desk. Wide screens show two facing pages joined by a spiral, tablets stack the pages, phones show one column of days. Month tabs run down the right edge like the paper agenda. */
 :root{
@@ -79,6 +79,15 @@ button.sync:hover{background:var(--chip)}
 .dstat span:nth-child(odd){color:var(--muted)}
 .cidin{width:100%;height:42px;border:1px solid var(--rule);border-radius:10px;background:var(--paper);padding:0 12px;font:500 13px var(--f-mono);color:var(--ink);margin-top:8px}
 .cidin:focus{outline:none;border-color:var(--accent)}
+.sbanner{position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + var(--bar-h) + 8px);z-index:56;display:flex;align-items:center;gap:10px;background:var(--paper);color:var(--ink);border:1px solid color-mix(in srgb,var(--holiday) 40%,var(--rule));box-shadow:var(--shadow);border-radius:12px;padding:7px 6px 7px 14px;font-size:14px;line-height:1.35;width:max-content;max-width:calc(100vw - 24px)}
+.sbanner i{flex:none;width:8px;height:8px;border-radius:50%;background:var(--holiday)}
+.sbanner .btn{flex:none;padding:6px 12px}
+.sbanner .ib{flex:none;width:32px;height:32px}
+.flab{display:block;font-size:13px;color:var(--muted);margin-top:12px}
+.flab+.cidin{margin-top:4px}
+.serr{color:var(--holiday);font-size:14px}
+.sync[data-s="off"] i{background:var(--muted);opacity:.6}
+.linkb{border:0;background:transparent;color:var(--accent);font:500 13px var(--f-text);padding:2px 0;text-decoration:underline;cursor:pointer}
 .mono{font:500 12px var(--f-mono);word-break:break-all}
 @keyframes pulse{50%{opacity:.35}}
 .menu{position:fixed;z-index:60;min-width:250px;background:var(--paper);border:1px solid var(--rule);border-radius:12px;box-shadow:var(--shadow);padding:6px;display:flex;flex-direction:column}
@@ -530,6 +539,7 @@ main{padding-block:18px 64px;padding-left:max(16px,env(safe-area-inset-left,0px)
 </header>
 <main><div class="view" id="view"></div></main>
 <nav class="rail" id="rail" aria-label="Linguette dell'agenda"></nav>
+<div class="sbanner" id="sbanner" role="status" hidden><i></i><span id="sbMsg"></span><button type="button" class="btn primary" id="sbBtn"></button><button type="button" class="ib" id="sbX" aria-label="Nascondi"></button></div>
 <div class="toast" id="toast" role="status"><span id="toastMsg"></span><button type="button" id="toastBtn" hidden></button></div>
 <input type="file" id="fileIn" accept=".json,application/json,text/plain" hidden>
 
@@ -647,6 +657,7 @@ const DBNAME='agenda-settimanale';
 const G_CLIENT_ID='787685947557-4vnm4ltsjrhtn72pm0mgpv9qdrkdjbhf.apps.googleusercontent.com';
 const G_SCOPE='https://www.googleapis.com/auth/drive.file';
 const DRIVE_OK=STANDALONE&&(location.protocol==='https:'||location.hostname==='localhost');
+const APPMODE=(navigator.standalone===true)||!!(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches);
 function lum(hex){const m=/^#?([0-9a-f]{6})$/i.exec(hex||''); if(!m) return 1; const n=parseInt(m[1],16); const c=[n>>16&255,n>>8&255,n&255].map(v=>{v/=255; return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);}); return .2126*c[0]+.7152*c[1]+.0722*c[2];}
 /* Stile: ogni pagina somma i livelli tutte le pagine < anno < mese < settimana (vince il più specifico). */
 const TH_COLORS=[
@@ -741,28 +752,44 @@ function createNote(g){const list=notesIn(g); const last=list[list.length-1]; co
   const id=rid(); S.docs['n_'+id]={u:Date.now(),d:Object.assign({},DEF_NSTYLE,base,{g,o:(last?(last.d.o||0):0)+1,title:'',text:'',strokes:[],created:Date.now()})}; dirty.add('n_'+id); changed(); return id;}
 let localT=null;
 function touch(k){const b=S.docs[k]; if(!b) return; b.u=Math.max(Date.now(),(b.u||0)+1); dirty.add(k); changed();}
-function changed(){persistSoon(); flushSoon(); updateSaveDot(); driveTouched();}
+function changed(){persistSoon(); flushSoon(); updateSaveDot(); driveTouched(); scTouched();}
 const touchDay=dk=>{const d=D(dk,false); if(d) d.u=Date.now(); touch('w_'+mondayOf(dk));};
 function touchMeta(sec){const m=M(); m.ts=m.ts||{}; m.ts[sec]=Date.now(); touch('meta');}
 
 /* ================= local storage (IndexedDB) ================= */
 const IDB=(()=>{let dbp=null;
-  function open(){if(!dbp) dbp=new Promise((res,rej)=>{try{const r=indexedDB.open(DBNAME,1); r.onupgradeneeded=()=>r.result.createObjectStore('kv'); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error);}catch(e){rej(e);}}); return dbp;}
+  /* Su iPhone e iPad il database del browser a volte non risponde all'apertura dell'app: mai aspettarlo per sempre. */
+  const tmo=(p,ms)=>new Promise((res,rej)=>{const t=setTimeout(()=>rej(new Error('idb-timeout')),ms); p.then(v=>{clearTimeout(t); res(v);},e=>{clearTimeout(t); rej(e);});});
+  function open(){if(!dbp){const p=new Promise((res,rej)=>{try{const r=indexedDB.open(DBNAME,1); r.onupgradeneeded=()=>r.result.createObjectStore('kv');
+      r.onsuccess=()=>{const db=r.result; db.onversionchange=()=>{try{db.close();}catch(e){} if(dbp===p) dbp=null;}; db.onclose=()=>{if(dbp===p) dbp=null;}; res(db);};
+      r.onerror=()=>rej(r.error); r.onblocked=()=>rej(new Error('idb-blocked'));}catch(e){rej(e);}});
+    dbp=p; p.catch(()=>{if(dbp===p) dbp=null;});} return dbp;}
+  async function run(fn,ms){const p=open(); try{return await tmo(p.then(fn),ms);}catch(e){if(dbp===p) dbp=null; throw e;}}
   return {
-    async get(k){const db=await open(); return new Promise((res,rej)=>{const q=db.transaction('kv').objectStore('kv').get(k); q.onsuccess=()=>res(q.result); q.onerror=()=>rej(q.error);});},
-    async set(k,v){const db=await open(); return new Promise((res,rej)=>{const t=db.transaction('kv','readwrite'); t.objectStore('kv').put(v,k); t.oncomplete=()=>res(); t.onerror=()=>rej(t.error);});}
+    get(k,ms){return run(db=>new Promise((res,rej)=>{const q=db.transaction('kv').objectStore('kv').get(k); q.onsuccess=()=>res(q.result); q.onerror=()=>rej(q.error);}),ms||4000);},
+    set(k,v,ms){return run(db=>new Promise((res,rej)=>{const t=db.transaction('kv','readwrite'); t.objectStore('kv').put(v,k); t.oncomplete=()=>res(); t.onerror=()=>rej(t.error); t.onabort=()=>rej(t.error);}),ms||8000);}
   };})();
-let saveT=null, storeOK=true;
+let saveT=null, storeOK=true, idbLate=false;
 function persistSoon(){clearTimeout(saveT); saveT=setTimeout(persistNow,350);}
-async function persistNow(){clearTimeout(saveT); try{await IDB.set('state',{docs:S.docs,dirty:[...dirty],remoteKeys:[...remoteKeys]}); storeOK=true;}catch(e){
-  try{localStorage.setItem('agenda-state',JSON.stringify({docs:S.docs,dirty:[...dirty]})); storeOK=true;}catch(e2){if(storeOK) toast('Questo dispositivo non può conservare i dati: salva il file per non perdere le modifiche.'); storeOK=false;}}}
-async function loadLocal(){try{const v=await IDB.get('state'); if(v&&v.docs) return v;}catch(e){} try{const v=JSON.parse(localStorage.getItem('agenda-state')||'null'); if(v&&v.docs) return v;}catch(e){} return null;}
+async function persistNow(){clearTimeout(saveT); const at=Date.now(); let ok=false, ls=false;
+  try{await IDB.set('state',{docs:S.docs,dirty:[...dirty],remoteKeys:[...remoteKeys],at}); ok=true;}catch(e){}
+  /* copia di riserva nel browser: serve se il database non risponde alla prossima apertura */
+  try{const txt=JSON.stringify({docs:S.docs,dirty:[...dirty],at}); if(txt.length<1800000||!ok){localStorage.setItem('agenda-state',txt); ls=true;} else localStorage.removeItem('agenda-state');}
+  catch(e2){try{if(ok) localStorage.removeItem('agenda-state');}catch(e3){}}
+  if(ok||ls) storeOK=true; else {if(storeOK) toast('Questo dispositivo non può conservare i dati: salva il file per non perdere le modifiche.'); storeOK=false;}}
+async function loadLocal(){let a=null,b=null;
+  try{const v=await IDB.get('state',3500); if(v&&v.docs) a=v;}catch(e){idbLate=true;}
+  try{const v=JSON.parse(localStorage.getItem('agenda-state')||'null'); if(v&&v.docs) b=v;}catch(e){}
+  if(a&&b) return (b.at||0)>(a.at||0)?b:a; return a||b;}
+/* se il database ha risposto in ritardo, recupera quello che c'era dentro senza perdere niente */
+async function lateLocal(){if(!idbLate) return; idbLate=false; let v=null; try{v=await IDB.get('state',25000);}catch(e){return;}
+  if(!v||!v.docs) return; const {got}=mergeIn(v.docs); ensureDefaults(); if(got.length){persistSoon(); remoteChanged(got); updateBar(); if(SC.on){SC.dirty=true; scSave(); scSoon(1500);}}}
 
 /* ================= sync between devices (private to the signed-in owner) ================= */
 let RCOL=null, flushing=false, flushT=null, syncState='init';
-function setSync(s){syncState=s; const el=$('#sync'); el.dataset.s=(s==='device'||s==='drive')?'ok':(s==='dauth'||s==='derror')?'error':s==='dbusy'?'busy':s;
-  const map={init:['Avvio…',''],busy:['Sincronizzo…','Sto salvando le modifiche nel tuo account'],ok:['Sincronizzata','Mac, iPad e iPhone vedono gli stessi dati'],local:['Solo questo dispositivo','Sincronizzazione non disponibile qui: usa Salva file'],drive:['Drive ✓','Sincronizzata con Google Drive'],dbusy:['Drive…','Sto sincronizzando con Google Drive'],dauth:['Drive: ricollega','Tocca per ricollegare Google Drive'],derror:['Drive in pausa','Google Drive non raggiungibile: riprovo tra poco. I dati restano su questo dispositivo.'],device:['Salvata qui','Tutto resta salvato in questo browser. Con «Salva file» crei la copia da tenere su OneDrive.'],error:['Sync in pausa','Riprovo appena possibile; intanto i dati restano su questo dispositivo']};
-  const [t,tt]=map[s]||map.init; el.lastChild.textContent=t; el.title=tt;}
+function setSync(s){syncState=s; const el=$('#sync'); el.dataset.s=(s==='device'||s==='drive'||s==='script')?'ok':(s==='dauth'||s==='derror'||s==='serror'||s==='skey')?'error':(s==='dbusy'||s==='sbusy'||s==='swait')?'busy':s==='soff'?'off':s;
+  const map={init:['Avvio…',''],busy:['Sincronizzo…','Sto salvando le modifiche nel tuo account'],ok:['Sincronizzata','Mac, iPad e iPhone vedono gli stessi dati'],local:['Solo questo dispositivo','Sincronizzazione non disponibile qui: usa Salva file'],drive:['Drive ✓','Sincronizzata con Google Drive'],dbusy:['Drive…','Sto sincronizzando con Google Drive'],dauth:['Drive: ricollega','Tocca per ricollegare Google Drive'],derror:['Drive in pausa','Google Drive non raggiungibile: riprovo tra poco. I dati restano su questo dispositivo.'],device:['Salvata qui','Tutto resta salvato in questo browser. Con «Salva file» crei la copia da tenere su OneDrive.'],script:['Sincronizzata','Sincronizzata con Google Drive (collegamento permanente)'],sbusy:['Sincronizzo…','Sto allineando l\'agenda con Google Drive'],swait:['Novità in arrivo','Ci sono modifiche da un altro dispositivo: le mostro appena smetti di scrivere'],serror:['Sync in pausa','Google Drive non raggiungibile: riprovo da sola. I dati restano su questo dispositivo.'],skey:['Sync da controllare','Il collegamento non funziona: tocca qui per controllarlo'],soff:['Offline','Senza internet: le modifiche restano qui e partono appena torna la connessione'],error:['Sync in pausa','Riprovo appena possibile; intanto i dati restano su questo dispositivo']};
+  const [t,tt]=map[s]||map.init; el.lastChild.textContent=t; el.title=tt+((SC.on||(DRIVE_OK&&DRV.on))?' · ultima sincronizzazione: '+fmtDT(SC.on?SC.lastSync:DRV.lastSync):'');}
 async function initRemote(){
   const c=window.claude; if(!c||typeof c.use!=='function'){setSync('device'); return;}
   try{const [db,user]=await Promise.all([c.use('db'),c.use('user')]); if(!db||!user){setSync('local'); return;}
@@ -793,14 +820,25 @@ function remoteChanged(keys){if(!cur) return; const mine=cur.t==='list'?keys:doc
   const a=document.activeElement; if(a&&a!==document.body&&$('#view').contains(a)){pendingRerender=true; return;} rerender();}
 function docsOfPage(r){if(r.t==='week') return ['w_'+r.w,'meta']; if(r.t==='day') return ['w_'+mondayOf(r.d),'meta']; if(r.t==='note') return ['n_'+r.id]; return ['meta'];}
 document.addEventListener('focusout',()=>{if(pendingRerender) setTimeout(()=>{const a=document.activeElement; if(pendingRerender&&(!a||a===document.body)){pendingRerender=false; rerender();}},150);});
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){pull(); driveResume();} else {persistNow(); flush(); if(DRIVE_OK&&DRV.on&&DRV.dirty) driveSync();}});
-window.addEventListener('pagehide',()=>{persistNow();});
-window.addEventListener('online',()=>{pull(); if(DRIVE_OK&&DRV.on) driveSync();});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){pull(); syncResume();} else {persistNow(); flush(); syncAway();}});
+window.addEventListener('pagehide',()=>{persistNow(); syncAway();});
+window.addEventListener('focus',()=>{if(SC.on) scSync();});
+window.addEventListener('online',()=>{pull(); if(SC.on) scSync(true); else if(DRIVE_OK&&DRV.on) driveSync();});
+window.addEventListener('offline',()=>{if(SC.on) setSync('soff');});
+function syncResume(){if(SC.on) scSync(); else driveResume();}
+function syncAway(){if(SC.on){if(SC.dirty||scPend) scSync(true);} else if(DRIVE_OK&&DRV.on&&DRV.dirty) driveSync();}
+/* Mentre scrivi l'agenda non cambia sotto le dita: le novità dagli altri dispositivi aspettano che tu finisca. */
+let lastInput=0;
+document.addEventListener('input',e=>{const t=e.target; if(t&&t.closest&&t.closest('#view')) lastInput=Date.now();},true);
+document.addEventListener('pointerdown',e=>{const t=e.target; if(t&&t.closest&&t.closest('canvas')) lastInput=Date.now();},true);
+function editingEl(){const a=document.activeElement; if(!a||a===document.body||!$('#view').contains(a)) return null; return (a.tagName==='INPUT'||a.tagName==='TEXTAREA'||a.tagName==='SELECT'||a.isContentEditable)?a:null;}
+function uiBusy(){if(document.visibilityState==='hidden') return false; if(document.querySelector('.modal:not([data-safe]),.menu')) return true;
+  const idle=Date.now()-lastInput; return idle<4000||(idle<12000&&!!editingEl());}
 setInterval(()=>{if(document.visibilityState==='visible'&&!dirty.size) pull();},120000);
 
 /* ================= file: save & open ================= */
 function unsaved(){const fs=M().fileSavedAt||0; for(const k in S.docs){const b=S.docs[k]; if((b.u||0)>1&&(b.u||0)>fs) return true;} return false;}
-function updateSaveDot(){const d=$('#saveDot'); if(d) d.hidden=!unsaved()||(DRIVE_OK&&!!DRV.on); const b=$('#bSave'); if(b) b.title=unsaved()?'Ci sono modifiche non ancora salvate nel file':'Ultimo file salvato: '+fmtDT(M().fileSavedAt);}
+function updateSaveDot(){const d=$('#saveDot'); if(d) d.hidden=!unsaved()||(DRIVE_OK&&!!DRV.on)||!!SC.on; const b=$('#bSave'); if(b) b.title=unsaved()?'Ci sono modifiche non ancora salvate nel file':'Ultimo file salvato: '+fmtDT(M().fileSavedAt);}
 async function saveFile(){
   const now=Date.now(); const docs={}; for(const k in S.docs){const b=S.docs[k]; if(!b.del&&(b.u||0)>0) docs[k]=b;} if(S.docs.meta) docs.meta=S.docs.meta;
   const data=JSON.stringify({format:'agenda-settimanale',version:1,savedAt:now,docs});
@@ -849,7 +887,7 @@ async function importData(text){
   for(const k in p.docs){const b=p.docs[k]; if(!validKey(k)||!b||typeof b!=='object'||!b.d||typeof b.d!=='object') continue; nd[k]={u:now,d:b.d};}
   for(const k of new Set([...Object.keys(S.docs),...remoteKeys])) if(!nd[k]&&k!=='meta') nd[k]={u:now,del:true};
   S.docs=nd; M().fileSavedAt=now; dirty.clear(); for(const k in S.docs) dirty.add(k); ensureDefaults();
-  await persistNow(); flush(); if(DRIVE_OK&&DRV.on){DRV.dirty=true; drvSave(); drvSoon(600);} cur=initialRef(); render(0); toast('Agenda caricata dal file.'); return true;
+  await persistNow(); flush(); if(DRIVE_OK&&DRV.on){DRV.dirty=true; drvSave(); drvSoon(600);} if(SC.on){SC.dirty=true; SC.edits=(SC.edits||0)+1; scSave(); scSoon(600);} cur=initialRef(); render(0); toast('Agenda caricata dal file.'); return true;
 }
 async function restoreBackup(){let b=null; try{b=await IDB.get('backup');}catch(e){}
   if(!b||!b.docs){toast('Non c\'è nessun dato precedente da ripristinare su questo dispositivo.'); return;}
@@ -865,7 +903,7 @@ const redirUri=()=>location.origin+location.pathname.replace(/index\.html$/,'');
 const tokenOk=()=>!!DRV.token&&(DRV.exp||0)>Date.now()+30000;
 const GAPI='https://www.googleapis.com/drive/v3', GUP='https://www.googleapis.com/upload/drive/v3';
 let drvBusy=false, drvAgain=false, drvT=null, drvAuthToast=false;
-function driveTouched(){if(!DRIVE_OK||!DRV.on) return; DRV.dirty=true; DRV.edits=(DRV.edits||0)+1; drvSave(); drvSoon();}
+function driveTouched(){if(!DRIVE_OK||!DRV.on||SC.on) return; DRV.dirty=true; DRV.edits=(DRV.edits||0)+1; drvSave(); drvSoon();}
 function drvSoon(ms){clearTimeout(drvT); if(DRIVE_OK&&DRV.on) drvT=setTimeout(driveSync,ms==null?4000:ms);}
 async function driveLogin(silent){
   if(!gcid()){openDrive(); return;}
@@ -912,29 +950,155 @@ function mergeWeek(L,R){const ld=L.d||{}, rd=R.d||{}, la=ld.days||{}, ra=rd.days
   return {u:Math.max(L.u||0,R.u||0),d:{style:ls>=rs?(ld.style===undefined?null:ld.style):rd.style,su:Math.max(ls,rs),days}};}
 const META_SECS=['profile','annual','annualHead','bdays','settings','years','welcomed'];
 function mergeMeta(L,R){const ld=L.d||{}, rd=R.d||{}, lt=ld.ts||{}, rt=rd.ts||{}; const lNew=(L.u||0)>=(R.u||0);
-  const out=clone(lNew?ld:rd), ts={};
-  for(const sec of META_SECS){const l=lt[sec]||0, r=rt[sec]||0; ts[sec]=Math.max(l,r);
-    if(l!==r){out[sec]=clone(l>r?ld[sec]:rd[sec]); continue;}
-    const nw=lNew?ld:rd, od=lNew?rd:ld;
-    if((sec==='annual'||sec==='annualHead')&&od[sec]) out[sec]=Object.assign({},od[sec],nw[sec]||{});
-    else if(sec==='bdays'&&Array.isArray(od[sec])){const ids=new Set((nw[sec]||[]).map(b=>b.id)); out[sec]=[...(nw[sec]||[]),...od[sec].filter(b=>!ids.has(b.id))];}
-    else if(nw[sec]!==undefined) out[sec]=clone(nw[sec]);}
+  const out=Object.assign({},lNew?ld:rd), ts={};
+  for(const sec of META_SECS){const l=lt[sec]||0, r=rt[sec]||0; ts[sec]=Math.max(l,r); const a=ld[sec], b=rd[sec];
+    if(JSON.stringify(a)===JSON.stringify(b)){if(a!==undefined) out[sec]=a; continue;}
+    if(l!==r){out[sec]=l>r?a:b; continue;}
+    const nw=lNew?a:b, od=lNew?b:a;
+    if((sec==='annual'||sec==='annualHead')&&od&&typeof od==='object') out[sec]=Object.assign({},od,nw||{});
+    else if(sec==='bdays'&&Array.isArray(od)){const ids=new Set((nw||[]).map(x=>x.id)); out[sec]=[...(nw||[]),...od.filter(x=>!ids.has(x.id))];}
+    else if(nw!==undefined) out[sec]=nw;}
   out.ts=ts; out.fileSavedAt=Math.max(ld.fileSavedAt||0,rd.fileSavedAt||0);
   return {u:Math.max(L.u||0,R.u||0),d:out};}
+/* il risultato dell'unione entra negli oggetti già esistenti, così quello che stai guardando resta collegato ai dati */
+function adopt(lb,m){lb.u=m.u; const d=lb.d, nd=m.d;
+  for(const x of Object.keys(d)) if(!(x in nd)) delete d[x];
+  for(const x in nd){if(x==='days'&&d.days&&nd.days&&typeof d.days==='object'){const dd=d.days; for(const y of Object.keys(dd)) if(!(y in nd.days)) delete dd[y]; Object.assign(dd,nd.days);} else d[x]=nd[x];}}
 function mergeIn(rdocs){const got=[]; let localNewer=false;
   for(const k in rdocs){if(!validKey(k)) continue; const rb=rdocs[k]; if(!rb||typeof rb!=='object'||(!rb.d&&!rb.del)) continue; const lb=S.docs[k];
     if(!lb){S.docs[k]=rb; got.push(k); continue;}
     if(!lb.del&&!rb.del&&lb.d&&rb.d&&(k==='meta'||k.startsWith('w_'))){
       const ls=JSON.stringify(lb), rs=JSON.stringify(rb); if(ls===rs) continue;
       const m=k==='meta'?mergeMeta(lb,rb):mergeWeek(lb,rb); const ms=JSON.stringify(m);
-      if(ms!==ls){S.docs[k]=m; got.push(k);} if(ms!==rs) localNewer=true; continue;}
+      if(ms!==ls){adopt(lb,m); got.push(k);} if(ms!==rs) localNewer=true; continue;}
     if((rb.u||0)>(lb.u||0)){S.docs[k]=rb; got.push(k);} else if((lb.u||0)>(rb.u||0)) localNewer=true;}
   for(const k in S.docs){if(!(k in rdocs)&&(S.docs[k].u||0)>1) localNewer=true;}
   return {got,localNewer};}
+/* Primo collegamento di un dispositivo nuovo: le sezioni ancora vuote qui non cancellano quelle piene su Drive. */
+function blankSec(sec,v){if(v==null) return true;
+  if(sec==='profile') return !String(v.note||'').trim()&&(v.groups||[]).every(g=>(g.fields||[]).every(f=>!String(f.value||'').trim()));
+  if(sec==='annual'||sec==='annualHead') return !Object.keys(v).some(k=>String(v[k]||'').trim());
+  if(sec==='bdays') return !v.length;
+  if(sec==='years') return JSON.stringify(v)==='[2026,2027]';
+  if(sec==='welcomed') return true;
+  if(sec==='settings'){const th=v.theme||{}; const emp=o=>!o||typeof o!=='object'||!Object.keys(o).some(k=>o[k]!=null&&k!=='v'&&(typeof o[k]!=='object'||Object.keys(o[k]).length));
+    return emp(th.all)&&['y','m','p'].every(k=>!th[k]||Object.values(th[k]).every(emp))&&[['weekStyle',DEF_WSTYLE],['noteStyle',DEF_NSTYLE],['yearStyle',DEF_TSTYLE],['monthStyle',DEF_TSTYLE],['infoStyle',DEF_TSTYLE],['bdayStyle',DEF_TSTYLE]].every(([k,df])=>!Object.keys(legacyPart(v[k],df)).length);}
+  return false;}
+function prepFirst(rdocs){const rm=rdocs&&rdocs.meta; if(!rm||!rm.d) return; const m=M(); m.ts=m.ts||{};
+  for(const sec of META_SECS) if(blankSec(sec,m[sec])&&!blankSec(sec,rm.d[sec])) m.ts[sec]=-1;}
+
+/* ================= collegamento permanente con Google Drive (Google Apps Script) =================
+   L'agenda parla con un piccolo programma che Stefano ha nel suo account Google (script.google.com).
+   Niente accessi che scadono: indirizzo e chiave restano su questo dispositivo, mai nel sito. */
+const SC=(()=>{let o={}; try{o=JSON.parse(localStorage.getItem('agenda-sync')||'{}')||{};}catch(e){} return o;})();
+function scSave(){try{localStorage.setItem('agenda-sync',JSON.stringify(SC));}catch(e){}}
+let scBusy=false, scAgain=false, scT=null, scPend=null, scIdleT=null, scLastGet=0, scFails=0;
+function scTouched(){if(!SC.on) return; SC.dirty=true; SC.edits=(SC.edits||0)+1; scSave(); scSoon(2500);}
+function scSoon(ms){clearTimeout(scT); if(SC.on) scT=setTimeout(()=>scSync(),ms==null?2500:ms);}
+async function scCall(q,url,key){
+  const ctl=window.AbortController?new AbortController():null; const t=setTimeout(()=>{if(ctl) ctl.abort();},45000);
+  try{let r;
+    try{r=await fetch(url||SC.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({key:key||SC.key},q)),redirect:'follow',cache:'no-store',credentials:'omit',signal:ctl?ctl.signal:undefined});}
+    catch(e){throw {net:true};}
+    let txt=''; try{txt=await r.text();}catch(e){throw {net:true};}
+    let j=null; try{j=JSON.parse(txt);}catch(e){}
+    if(!j||typeof j!=='object'){if(r.status===404) throw {nf:true}; if(/accounts\.google|ServiceLogin|signin/i.test(txt)) throw {access:true}; throw {script:true,msg:'risposta inattesa (HTTP '+r.status+')'};}
+    if(j.err==='chiave') throw {key:true};
+    if(j.err==='conflitto') throw {conflict:true,version:j.version};
+    if(j.err==='occupato') throw {busy:true};
+    if(j.err) throw {script:true,msg:j.msg||j.err};
+    return j;
+  }finally{clearTimeout(t);}}
+function scErrText(e){e=e||{};
+  if(e.key) return 'La chiave non è giusta: copiala di nuovo dalla riga CHIAVE dello script.';
+  if(e.nf) return 'Indirizzo non trovato: copia di nuovo l\'URL dell\'app web (finisce con /exec).';
+  if(e.access) return 'Lo script non è aperto: nel deployment «Chi ha accesso» deve essere «Chiunque».';
+  if(e.net) return navigator.onLine===false?'Sei offline: riprovo appena torna internet.':'Non riesco a raggiungere lo script. Controlla l\'indirizzo e che «Chi ha accesso» sia «Chiunque».';
+  if(e.busy) return 'Google è occupato in questo momento: riprovo tra poco.';
+  return 'Lo script ha risposto con un errore'+(e.msg?': '+e.msg:'.');}
+function applyRemote(docs,first){const a=editingEl(); if(a){try{a.blur();}catch(e){}}
+  if(first) prepFirst(docs);
+  const r=mergeIn(docs); ensureDefaults();
+  if(r.got.length){persistSoon(); if(cur) remoteChanged(r.got); updateBar();}
+  return r;}
+function scWaitIdle(){setSync('swait'); clearInterval(scIdleT); scIdleT=setInterval(()=>{if(!scPend||!SC.on){clearInterval(scIdleT); return;} if(!uiBusy()){clearInterval(scIdleT); scSync(true);}},1500);}
+async function scSync(force){
+  if(!SC.on||!SC.url) return;
+  if(scBusy){scAgain=true; return;}
+  if(navigator.onLine===false){setSync('soff'); return;}
+  if(!force&&!SC.dirty&&!scPend&&Date.now()-scLastGet<4000) return;
+  scBusy=true; clearTimeout(scT);
+  try{
+    if(scPend){if(uiBusy()){scWaitIdle(); return;} const p=scPend; scPend=null; const r=applyRemote(p.docs,!SC.ver); SC.ver=p.v; if(r.localNewer) SC.dirty=true; scSave();}
+    setSync('sbusy');
+    for(let round=0;round<4;round++){
+      const stamp=SC.edits||0;
+      const g=await scCall({op:'get',have:SC.ver||''}); scLastGet=Date.now();
+      if(!g.same){const v=g.version||''; let pj=null; if(g.data){try{pj=JSON.parse(g.data);}catch(e){}}
+        if(pj&&pj.docs&&typeof pj.docs==='object'){
+          if(uiBusy()){scPend={v,docs:pj.docs}; scWaitIdle(); return;}
+          const r=applyRemote(pj.docs,!SC.ver); if(r.localNewer) SC.dirty=true;}
+        else if(!v) SC.dirty=true;
+        else throw {script:true,msg:'Agenda.json su Drive non si legge'};
+        SC.ver=v; scSave();}
+      if(!SC.dirty) break;
+      try{const p=await scCall({op:'put',base:SC.ver||'',data:drvBody()}); SC.ver=p.version||''; if((SC.edits||0)===stamp) SC.dirty=false; scSave(); if(SC.dirty) scSoon(2500); break;}
+      catch(e){if(e&&e.conflict){SC.ver='?'; continue;} throw e;}}
+    SC.lastSync=Date.now(); SC.err=''; SC.errMsg=''; scFails=0; scSave(); setSync('script'); hideBanner('s'); updateSaveDot();
+  }catch(e){e=e||{}; scFails++; const fix=!!(e.key||e.nf||e.access);
+    SC.err=fix?'setup':e.net?'net':'script'; SC.errMsg=scErrText(e); scSave();
+    setSync(fix?'skey':navigator.onLine===false?'soff':'serror');
+    if(fix) showBanner('s','La sincronizzazione è ferma: il collegamento va controllato.','Controlla',openSync);
+    else if(SC.dirty&&Date.now()-(SC.lastSync||0)>5*60000&&navigator.onLine!==false) showBanner('s','Le ultime modifiche non sono ancora su Google Drive.','Riprova',()=>scSync(true));
+    if(!fix) scSoon(Math.min(300000,15000*Math.pow(2,Math.min(scFails-1,4))));
+  }finally{scBusy=false; if(scAgain){scAgain=false; scSoon(800);}}}
+let sbKind='';
+function showBanner(kind,msg,label,fn){sbKind=kind; $('#sbMsg').textContent=msg; const b=$('#sbBtn'); b.textContent=label; b.onclick=()=>fn(); $('#sbanner').hidden=false;}
+function hideBanner(kind){if(!kind||sbKind===kind){$('#sbanner').hidden=true; sbKind='';}}
+function scCode(){return SC.url+'#'+SC.key;}
+function openSync(){
+  const body=h('div'); let close=null;
+  function draw(){body.textContent='';
+    if(!SC.on){
+      const u=h('input',{type:'url',class:'cidin',id:'scUrl',placeholder:'https://script.google.com/macros/s/…/exec',autocomplete:'off',autocapitalize:'off',spellcheck:'false','aria-label':'Indirizzo dello script'});
+      const k=h('input',{type:'text',class:'cidin',id:'scKey',placeholder:'chiave dello script',autocomplete:'off',autocapitalize:'off',spellcheck:'false','aria-label':'Chiave'});
+      const split=()=>{const v=u.value.trim(); const i=v.indexOf('#'); if(i>0){u.value=v.slice(0,i); if(v.slice(i+1)) k.value=v.slice(i+1);}};
+      u.addEventListener('input',split); u.addEventListener('change',split);
+      const go=h('button',{type:'button',class:'btn primary',id:'scGo'},'Collega');
+      go.addEventListener('click',async()=>{split(); const url=u.value.trim(), key=k.value.trim();
+        if(!/^https:\/\/script\.google\.com\/.+\/exec$/.test(url)){toast('L\'indirizzo deve iniziare con https://script.google.com/ e finire con /exec.',null,null,7000); return;}
+        if(key.length<8){toast('Manca la chiave: è nella riga CHIAVE in alto nello script.',null,null,7000); return;}
+        go.disabled=true; go.textContent='Provo il collegamento…';
+        try{const r=await scCall({op:'ping'},url,key);
+          Object.assign(SC,{on:true,url,key,ver:'',dirty:false,err:'',errMsg:'',lastSync:0}); scSave(); scPend=null; scLastGet=0;
+          if(DRV.on){DRV.on=false; DRV.token=''; drvSave();} hideBanner();
+          draw(); toast(r.version?'Collegato. Unisco l\'agenda di Google Drive con quella di questo dispositivo…':'Collegato. Creo Agenda.json nel tuo Google Drive…',null,null,6000); await scSync(true); draw();}
+        catch(e){go.disabled=false; go.textContent='Collega'; toast(scErrText(e),null,null,9000);}});
+      addKids(body,[h('p',null,'Il collegamento permanente tiene allineati Mac, iPad e iPhone attraverso il tuo Google Drive. Non scade: non serve più rifare l\'accesso a Google.'),
+        h('label',{class:'flab',for:'scUrl'},'Indirizzo dello script (finisce con /exec)'),u,
+        h('label',{class:'flab',for:'scKey'},'Chiave'),k,
+        h('p',{class:'note-inline'},'Se hai il «codice di collegamento» (indirizzo#chiave), incollalo tutto nel primo campo: si divide da solo.'),
+        h('div',{class:'mbtns'},go)]);
+      if(DRIVE_OK) addKids(body,[h('hr'),h('p',{class:'note-inline'},DRV.on?'Adesso usi il vecchio accesso Google, che ogni tanto va ricollegato. ':'',h('button',{type:'button',class:'linkb',on:{click:()=>{if(close) close(); openDrive();}}},DRV.on?'Vedi il vecchio accesso':'Usa il vecchio accesso Google'))]);
+      return;}
+    const st=navigator.onLine===false?'offline: le modifiche partono appena torna internet':SC.err==='setup'?'collegamento da controllare':SC.err?'in pausa, riprovo da sola':scPend?'novità in attesa che tu finisca di scrivere':'attiva';
+    const code=h('textarea',{class:'copybox',readonly:true,style:{height:'64px'},value:scCode(),'aria-label':'Codice di collegamento'});
+    addKids(body,[h('div',{class:'dstat'},h('span',null,'Stato'),h('span',null,st),h('span',null,'Ultima sincronizzazione'),h('span',null,fmtDT(SC.lastSync)),
+        h('span',null,'Modifiche da inviare'),h('span',null,SC.dirty?'sì, partono da sole':'nessuna'),h('span',null,'File'),h('span',null,'Agenda.json nel tuo Google Drive')),
+      SC.err&&SC.errMsg?h('p',{class:'serr'},SC.errMsg):null,
+      h('p',{class:'note-inline'},'Codice per collegare gli altri dispositivi (tienilo per te):'),code,
+      h('div',{class:'mbtns'},
+        h('button',{type:'button',class:'btn',on:{click:async()=>{if(!await confirmBox('Scollegare questo dispositivo?',[h('p',null,'I dati restano qui, ma non si sincronizzano più finché non lo ricolleghi.')],'Scollega',true)) return; Object.assign(SC,{on:false,ver:'',dirty:false,err:''}); scSave(); scPend=null; hideBanner(); setSync('device'); updateSaveDot(); draw();}}},'Scollega'),
+        h('button',{type:'button',class:'btn',on:{click:async()=>{try{await navigator.clipboard.writeText(scCode()); toast('Codice copiato.');}catch(e){code.focus(); code.select();}}}},'Copia codice'),
+        h('button',{type:'button',class:'btn primary',on:{click:async()=>{await scSync(true); draw(); if(!SC.err) toast('Agenda sincronizzata.');}}},'Sincronizza adesso'))]);
+  }
+  draw(); close=modal('Sincronizzazione',[body],[],null,true);
+}
 async function driveSync(){
-  if(!DRIVE_OK||!DRV.on) return;
+  if(!DRIVE_OK||!DRV.on||SC.on) return;
   if(drvBusy){drvAgain=true; return;}
   if(!tokenOk()){setSync('dauth'); driveAuthHint(); return;}
+  if(uiBusy()){drvSoon(3000); return;}
   drvBusy=true; setSync('dbusy');
   try{
     let f=null;
@@ -943,11 +1107,7 @@ async function driveSync(){
     if(f&&String(f.version)!==String(DRV.ver||'')){
       const txt=await drvDownload(f.id); let pj=null; try{pj=JSON.parse(txt);}catch(e){}
       if(pj&&pj.docs&&typeof pj.docs==='object'){
-        if(!DRV.ver&&hasLocalData()){
-          const ch=await choiceBox('Su Google Drive c\'è già un\'agenda',[h('p',null,'È stata salvata il ',h('b',null,fmtDT(pj.savedAt)),'. Anche questo dispositivo ha già dei dati.'),
-            h('p',null,'«Unisci» mette insieme le due agende giorno per giorno, senza perdere niente. «Usa solo quella di Drive» sostituisce i dati di questo dispositivo.')],['merge','Unisci (consigliato)'],['drive','Usa solo quella di Drive']);
-          if(ch==='drive'){try{await IDB.set('backup',{docs:S.docs,at:Date.now()});}catch(e){} S.docs={}; ensureDefaults();}
-        }
+        if(!DRV.ver) prepFirst(pj.docs);
         const {got,localNewer}=mergeIn(pj.docs); ensureDefaults();
         if(got.length){persistSoon(); if(!DRV.ver){cur=cur||initialRef(); rerender();} else remoteChanged(got); updateBar();}
         if(localNewer) DRV.dirty=true;
@@ -959,16 +1119,17 @@ async function driveSync(){
       DRV.fileId=res.id; DRV.ver=String(res.version); if((DRV.edits||0)===stamp) DRV.dirty=false;
     }
     if(!DRV.email) DRV.email=await drvEmail();
-    DRV.lastSync=Date.now(); DRV.err=''; if(DRV.firstToast){DRV.firstToast=false; toast('Google Drive collegato: l\'agenda è sincronizzata.');} drvSave(); setSync('drive'); updateSaveDot();
+    DRV.lastSync=Date.now(); DRV.err=''; hideBanner('d'); if(DRV.firstToast){DRV.firstToast=false; toast('Google Drive collegato: l\'agenda è sincronizzata.');} drvSave(); setSync('drive'); updateSaveDot();
   }catch(e){
     if(e&&e.auth){setSync('dauth'); driveAuthHint();}
     else if(e&&e.setup){DRV.err='setup'; setSync('derror'); toast('Google Drive non è attivo nel progetto Google Cloud: controlla il passo «Attiva Google Drive API».',null,null,9000);}
     else {DRV.err='net'; DRV.errMsg=String((e&&(e.message||e.http))||e).slice(0,200); setSync('derror'); setTimeout(()=>{if(document.visibilityState==='visible') driveSync();},30000);}
   }finally{drvBusy=false; drvSave(); if(drvAgain){drvAgain=false; drvSoon(1200);}}
 }
-function driveAuthHint(){if(drvAuthToast) return; drvAuthToast=true; toast('Google Drive va ricollegato.','Ricollega',()=>driveLogin(false),9000);}
-function driveCanAutoLogin(){return DRIVE_OK&&DRV.on&&gcid()&&!DRV.needTap&&Date.now()-(DRV.silentAt||0)>10*60000;}
-function driveResume(){if(!DRIVE_OK||!DRV.on) return; if(tokenOk()){driveSync(); return;}
+function driveAuthHint(){if(SC.on) return; showBanner('d','Google Drive si è scollegato: le modifiche restano qui.','Ricollega',()=>driveLogin(false));}
+function driveCanAutoLogin(){return DRIVE_OK&&DRV.on&&!SC.on&&!APPMODE&&gcid()&&!DRV.needTap&&Date.now()-(DRV.silentAt||0)>10*60000;}
+function driveResume(){if(!DRIVE_OK||!DRV.on||SC.on) return; if(tokenOk()){driveSync(); return;}
+  if(!driveCanAutoLogin()){setSync('dauth'); driveAuthHint(); return;}
   const a=document.activeElement; const typing=a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA');
   if(!typing&&!document.querySelector('.modal')&&driveCanAutoLogin()) driveLogin(true); else setSync('dauth');}
 function openDrive(){
@@ -991,7 +1152,7 @@ function openDrive(){
         h('button',{type:'button',class:'btn',on:{click:()=>{DRV.on=false; DRV.token=''; DRV.fileId=''; DRV.ver=''; DRV.dirty=false; drvSave(); setSync('device'); updateSaveDot(); draw(); toast('Google Drive scollegato. I dati restano su questo dispositivo.');}}},'Scollega'),
         tokenOk()?h('button',{type:'button',class:'btn primary',on:{click:()=>{if(close) close(); driveSync();}}},'Sincronizza adesso'):h('button',{type:'button',class:'btn primary',on:{click:()=>driveLogin(false)}},'Ricollega'))]);
   }
-  draw(); close=modal('Google Drive',[body],[]);
+  draw(); close=modal('Google Drive',[body],[],null,true);
 }
 
 /* ================= navigation ================= */
@@ -1649,9 +1810,9 @@ function openStyle(r){r=r||cur; if(!r) return;
   draw(); modal('Stile',[body],[h('button',{type:'button',class:'btn primary','data-close':'1'},'Fatto')]);
 }
 /* ---------- modal, confirm, toast ---------- */
-function modal(title,content,buttons,onClose){
-  const scrim=h('div',{class:'scrim'}); const box=h('div',{class:'modal',role:'dialog','aria-modal':'true','aria-label':title});
-  const close=()=>{scrim.classList.remove('on'); box.remove(); setTimeout(()=>scrim.remove(),200); document.removeEventListener('keydown',esc); if(onClose) onClose();};
+function modal(title,content,buttons,onClose,safe){
+  const scrim=h('div',{class:'scrim'}); const box=h('div',{class:'modal',role:'dialog','aria-modal':'true','aria-label':title}); if(safe) box.dataset.safe='1';
+  const close=()=>{scrim.classList.remove('on'); box.remove(); setTimeout(()=>scrim.remove(),200); document.removeEventListener('keydown',esc); if(onClose) onClose(); if(scPend) setTimeout(()=>{if(!uiBusy()) scSync(true);},300);};
   const esc=e=>{if(e.key==='Escape') close();};
   addKids(box,[h('h2',null,title),h('button',{type:'button',class:'ib x','aria-label':'Chiudi',on:{click:close}},icon('close')),content]);
   if(buttons&&buttons.length) box.append(h('div',{class:'mbtns'},buttons));
@@ -1730,7 +1891,7 @@ function openMore(){
   const m=h('div',{class:'menu',role:'menu',style:{top:(b.bottom+6)+'px',right:Math.max(12,window.innerWidth-b.right)+'px'}});
   const close=()=>{m.remove(); scrim.remove();};
   const item=(ic,label,fn)=>h('button',{type:'button',role:'menuitem',on:{click:()=>{close(); fn();}}},icon(ic),label);
-  m.append(DRIVE_OK?item('open','Google Drive…',openDrive):null,item('open','Apri file…',openFile),item('save','Salva file',saveFile),h('hr'),
+  m.append(STANDALONE?item('open','Sincronizzazione…',openSync):null,item('open','Apri file…',openFile),item('save','Salva file',saveFile),h('hr'),
     item('restore','Ripristina i dati precedenti',restoreBackup),item('info','Come funziona',openHelp),h('hr'),
     h('small',null,'Ultimo file salvato: '+fmtDT(M().fileSavedAt)));
   scrim.addEventListener('click',close); document.body.append(scrim,m);
@@ -1741,7 +1902,7 @@ function openHelp(){
     h('li',null,h('b',null,'Salva file '),'crea ',h('b',null,'Agenda.json'),' con tutto dentro. Su iPhone e iPad scegli «Salva su File» → OneDrive e sostituisci il file vecchio. Il pallino rosso sul pulsante vuol dire che ci sono modifiche non ancora nel file.'),
     h('li',null,h('b',null,'Apri file '),'(menu ⋯) carica un Agenda.json, per esempio da OneDrive. Se ti sbagli, «Ripristina i dati precedenti» torna a prima.'),
     h('li',null,h('b',null,'Sfoglia '),'con le frecce in alto, con ← → sulla tastiera o scorrendo il dito a destra e a sinistra. Le linguette a destra portano ai mesi.'),
-    DRIVE_OK?h('li',null,h('b',null,'Google Drive: '),'menu ⋯ → «Google Drive…» collega l\'agenda al tuo Drive personale: da quel momento si salva da sola e ritrovi tutto su ogni dispositivo collegato.'):null,
+    STANDALONE?h('li',null,h('b',null,'Sincronizzazione: '),'menu ⋯ → «Sincronizzazione…» collega l\'agenda al tuo Google Drive con il collegamento permanente: si allinea da sola su Mac, iPad e iPhone, anche mentre la usi. Il pallino in alto è verde quando è tutto a posto; mentre scrivi, le novità dagli altri dispositivi aspettano che tu finisca.'):null,
     h('li',null,h('b',null,'Compleanni: '),'nella pagina «Compleanni» (linguetta Auguri) scegli giorno e mese e scrivi il nome; ogni anno il compleanno compare evidenziato nel giorno giusto. Con l\'anno di nascita vedi anche quanti anni compie.'),
     h('li',null,h('b',null,'Stile: '),'il pulsante «Stile» in alto cambia tutti i colori (anche lo sfondo dietro l\'agenda), il carattere e la grandezza, anche solo per Appuntamenti, Cose da fare o Note. Scegli se applicarlo a questa settimana, al mese, all\'anno o a tutte le pagine: vince sempre la scelta più specifica.'),
     h('li',null,h('b',null,'Sposta e copia: '),'il pulsante ⋯ accanto a un appuntamento, a una cosa da fare o alle Note (anche negli Elenchi) apre «Sposta in un altro giorno», «Copia in un altro giorno» ed «Elimina». Dopo lo spostamento puoi sempre premere «Annulla».'),
@@ -1758,16 +1919,16 @@ function openHelp(){
 function openWelcome(){
   const inp=h('input',{type:'text',id:'welcomeName',class:'wname',placeholder:'il tuo nome',autocomplete:'off','aria-label':'Agenda di'});
   let close=null;
-  const start=()=>{const v=inp.value.trim(); M().profile.owner=v; M().welcomed=true; touchMeta('profile'); updateBar(); if(cur&&cur.t==='info') rerender(); if(close) close();};
+  const start=()=>{const v=inp.value.trim(); M().profile.owner=v; M().welcomed=true; if(v) touchMeta('profile'); else touchMeta('welcomed'); updateBar(); if(cur&&cur.t==='info') rerender(); if(close) close();};
   inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault(); start();}});
   close=modal('Benvenuto',[h('p',null,'Dai un nome alla tua agenda. Puoi cambiarlo quando vuoi nella pagina «Dati personali».'),
     h('div',{class:'wrow'},h('span',{class:'wpre'},'Agenda di'),inp),
     h('p',{class:'note-inline'},'Quello che scrivi resta su questo dispositivo e nel file che salvi tu.'),
-    DRIVE_OK?h('p',{style:{marginTop:'12px'}},h('button',{type:'button',class:'add',on:{click:()=>{if(close) close(); if(gcid()) driveLogin(false); else openDrive();}}},'Ho già l\'agenda su Google Drive: collegala')):null],
-    [h('button',{type:'button',class:'btn',on:{click:()=>{M().welcomed=true; touchMeta('profile'); close();}}},'Più tardi'),h('button',{type:'button',class:'btn primary',on:{click:start}},'Inizia')]);
+    STANDALONE?h('p',{style:{marginTop:'12px'}},h('button',{type:'button',class:'add',on:{click:()=>{if(close) close(); openSync();}}},'Ho già l\'agenda su Google Drive: collegala')):null],
+    [h('button',{type:'button',class:'btn',on:{click:()=>{M().welcomed=true; touchMeta('welcomed'); close();}}},'Più tardi'),h('button',{type:'button',class:'btn primary',on:{click:start}},'Inizia')]);
   setTimeout(()=>{try{inp.focus();}catch(e){}},260);
 }
-function maybeWelcome(){if(!(M().profile.owner||'').trim()&&!M().welcomed&&!(DRIVE_OK&&DRV.on)&&!document.querySelector('.modal')) openWelcome();}
+function maybeWelcome(){if(!(M().profile.owner||'').trim()&&!M().welcomed&&!(DRIVE_OK&&DRV.on)&&!SC.on&&!document.querySelector('.modal')) openWelcome();}
 
 /* ---------- gestures & keys ---------- */
 let sw=null;
@@ -1791,23 +1952,27 @@ async function boot(){
   $('#bToday').addEventListener('click',goToday); $('#bStyle').prepend(icon('palette')); $('#bStyle').addEventListener('click',()=>openStyle(cur)); $('#bSave').addEventListener('click',saveFile); $('#bMore').addEventListener('click',openMore);
   measureBar(); window.addEventListener('resize',measureBar); if(window.ResizeObserver) new ResizeObserver(measureBar).observe($('#bar'));
   const dret=DRIVE_OK?driveHandleReturn():null;
-  $('#sync').addEventListener('click',()=>{if(!DRIVE_OK){openHelp(); return;} if(!DRV.on){openDrive(); return;} if(tokenOk()) driveSync(); else driveLogin(false);});
+  $('#sync').addEventListener('click',()=>{if(!STANDALONE){openHelp(); return;} if(!SC.on&&DRIVE_OK&&DRV.on&&!tokenOk()){driveLogin(false); return;} openSync();});
+  $('#sbX').append(icon('close')); $('#sbX').addEventListener('click',()=>hideBanner());
+  (()=>{const gf=document.getElementById('gfont'); if(!gf) return; const on=()=>{gf.media='all'; if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>view.querySelectorAll('textarea.auto').forEach(autosize));}; if(gf.sheet) on(); else gf.addEventListener('load',on);})();
   const loaded=await loadLocal();
   if(loaded){S.docs=loaded.docs||{}; (loaded.dirty||[]).forEach(k=>dirty.add(k)); remoteKeys=new Set(loaded.remoteKeys||[]);}
   ensureDefaults(); cur=initialRef(); render(0); setSync('init');
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>view.querySelectorAll('textarea.auto').forEach(autosize));
   if(STANDALONE){try{if(navigator.storage&&navigator.storage.persist) navigator.storage.persist();}catch(e){}
     if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')){navigator.serviceWorker.register('sw.js').catch(()=>{});}}
-  await initRemote(); updateBar();
-  if(DRIVE_OK){
+  await initRemote(); updateBar(); lateLocal();
+  if(STANDALONE&&SC.on){setSync('sbusy'); scSync(true);}
+  else if(DRIVE_OK){
     if(dret==='first') DRV.firstToast=true;
-    else if(dret&&dret.startsWith('error:')&&!dret.includes('interaction_required')&&!dret.includes('login_required')&&!dret.includes('consent_required')) toast('Collegamento a Google non riuscito. Riprova da ⋯ → Google Drive.',null,null,7000);
+    else if(dret&&dret.startsWith('error:')&&!dret.includes('interaction_required')&&!dret.includes('login_required')&&!dret.includes('consent_required')) toast('Collegamento a Google non riuscito. Riprova da ⋯ → Sincronizzazione.',null,null,7000);
     if(DRV.on){if(tokenOk()) driveSync(); else if(driveCanAutoLogin()){driveLogin(true); return;} else {setSync('dauth'); driveAuthHint();}}
-    setInterval(()=>{if(document.visibilityState==='visible'&&DRV.on&&tokenOk()) driveSync();},90000);
   }
+  if(STANDALONE) setInterval(()=>{if(document.visibilityState!=='visible') return; if(SC.on){scSync(); return;}
+    if(DRIVE_OK&&DRV.on){if(tokenOk()) driveSync(); else {setSync('dauth'); driveAuthHint();}}},60000);
   maybeWelcome();
 }
-boot();
+boot().catch(e=>{try{console.error(e); if(cur) render(0);}catch(_){}});
 })();
 </script>
 
